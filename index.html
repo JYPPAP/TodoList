@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Todo-List</title>
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/index.css" after>
+
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="header">Todo-List</div>
+    <div class="main">
+      <div class="todo_wrap">
+        <!-- 값 입력
+          입력창에 입력 후 엔터, 또는 추가 버튼 클릭 시 값 입력
+            입력된 값은 입력창에 입력된 값 > h4 태그에 넣기.
+            아래쪽에 work / yyyy/mm/dd hh:mm:ss의 형태로 출력
+        -->
+        
+          <!-- 입력창 -->
+          <input type="text" id="todo_input">
+          <!-- 추가 -->
+          <button id="insert" class="btn"></button>
+          <!-- 삭제 
+            버튼 클릭 시 다중 삭제 가능
+              1) 각 리스트 체크박스 표시
+              2) 추가, 정렬 버튼 비활성화
+            삭제 버튼 다시 클릭 시 체크된 리스트 삭제 후 체크박스 숨기기.
+          -->
+          <button id="remove" class="btn"></button>
+          <!-- 정렬 
+            1) 각 리스트 라디오 버튼 표시
+            2) 추가, 정렬 버튼 비활성화 및 UI 변경
+            - 정렬 버튼 클릭 시 체크된 리스트를 입력한 숫자 위치로 이동 후 라디오 버튼 숨기기 및 UI 초기화
+            ?? 체크된 리스트는 한 개만 체크될 수 있도록 만들어야 하는 것인지?
+          -->
+          <button id="sort" class="btn"></button>
+      </div>
+
+      <!-- 값 출력 -->
+      <div class="list_wrap">
+        <ul id="list">
+          <!--
+            리스트 동작구현
+              1. 텍스트 영역 클릭 시 텍스트 line-through 처리
+                - 텍스트 중앙에 선, 글자 색 흐릿하게 변경.
+              2. 리스트에 마우스 오버 시 삭제 아이콘 표시
+              3. 오른쪽 영역 클릭 시 
+                - 오른쪽에 순서 변경 및 체크 아이콘 표시
+                  - 각각의 순서를 바꿀 수 있도록 구성
+          -->
+          <li class="item">
+            <span>❌</span>
+            <h4>AM 10:00 오전 빌드</h4>
+            <p><span>work / </span>2020/01/02 15:35:40</p>
+          </li>
+          <li class="item">
+            <span>❌</span>
+            <h4>PM 09:30 저녁약속</h4>
+            <p><span>work / </span>2020/01/02 15:34:56</p>
+          </li>
+          <li class="item">
+            <span>❌</span>
+            <h4>PM 08:00 이삿짐 포장</h4>
+            <p><span>work / </span>2020/01/02 15:37:13</p>
+          </li>
+          <li class="item">
+            <span>❌</span>
+            <h4>AM 09:30 주간업무보고</h4>
+            <p><span>work / </span>2020/01/02 15:35:28</p>
+          </li>
+        </ul>
+      </div>
+        
+        
+    </div>
+  </div>
+  <script src="js/index.js"></script>
+</body>
+
+</html>
