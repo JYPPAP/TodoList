@@ -52,6 +52,7 @@ body {
   background-color: rgb(181, 214, 146);
   border-radius: 25%;
 }
+
 .btn.off {
   color: #aaa;
   text-decoration: line-through;
@@ -61,13 +62,20 @@ body {
 
 .sort_area {
   margin: 10px;
+  display: none;
+  height: 0;
+  transition: all .3s;
 
-  // display: none;
   &:after {
     display: block;
     clear: both;
     content: '';
   }
+}
+
+.sort_area.on {
+  display: block;
+  height: 20px;
 }
 
 #sort_num {
@@ -81,19 +89,18 @@ body {
   margin-left: 10px;
 }
 
-.sort_area.on {
-  display: block;
-}
+
 
 /* 값 출력 */
 .list_wrap {
   padding-top: 20px;
   border-top: 1px solid rgb(163, 204, 163);
 }
+
 // #list {}
 
 // .item {}
-.set_btn_wrap {
-  .delete_item {}
-  .che
-}
+// .set_btn_wrap {
+//   .delete_item {}
+//   .che
+// }
