@@ -1,2 +1,99 @@
 @charset "utf-8";
 
+body {
+  color: #e2e2e2;
+  background-color: #333;
+}
+
+.wrap {
+  width: 100%;
+  height: 100%;
+}
+
+.inner {
+  width: 500px;
+  margin: 50px auto 0;
+}
+
+/* header */
+.header {
+  height: 100px;
+  padding-bottom: 40px;
+  font-size: 5rem;
+  color: #222;
+  text-align: center;
+  background-color: rgb(181, 214, 146);
+}
+
+/* main */
+.main {
+  padding: 20px 10px;
+  border: 2px solid rgb(163, 204, 163);
+}
+
+.todo_wrap {
+  margin-bottom: 20px;
+}
+
+#todo_input_text {
+  width: 60%;
+  height: 50px;
+  padding-left: 10px;
+  background-color: #333;
+  border: none;
+  border-bottom: 1px solid rgb(192, 168, 1);
+  outline: none;
+}
+
+.btn {
+  padding: 5px 10px;
+  font-weight: bold;
+  color: #333;
+  background-color: rgb(181, 214, 146);
+  border-radius: 25%;
+}
+.btn.off {
+  color: #aaa;
+  text-decoration: line-through;
+  cursor: default;
+  border: 2px inset #ccc;
+}
+
+.sort_area {
+  margin: 10px;
+
+  // display: none;
+  &:after {
+    display: block;
+    clear: both;
+    content: '';
+  }
+}
+
+#sort_num {
+  float: right;
+  width: 40px;
+  margin-top: 2px;
+}
+
+#sort_btn_on {
+  float: right;
+  margin-left: 10px;
+}
+
+.sort_area.on {
+  display: block;
+}
+
+/* 값 출력 */
+.list_wrap {
+  padding-top: 20px;
+  border-top: 1px solid rgb(163, 204, 163);
+}
+// #list {}
+
+// .item {}
+.set_btn_wrap {
+  .delete_item {}
+  .che
+}
