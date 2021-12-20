@@ -78,11 +78,12 @@ document.addEventListener("DOMContentLoaded", function () {
     1. text_box에 추가될 off 클래스
     2. 
      */
-    var click_item = e.target;
     console.log(e);
-    var event_item = e.path[2];
+    var click_item = e.target,
+        event_item = e.path[2],
+        text_box = click_item.parentNode,
     /* 클릭한 요소의 item 인덱스 번호 */
-    var event_idx = getElementIndex(event_item);
+        event_idx = getElementIndex(event_item);
     todo_list = localStorage.getItem('todo_list');
     list_value = (todo_list.split(/[\|\;]/g)).slice(0, -1);
     console.log(event_idx);
@@ -93,21 +94,18 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log(click_item.parentNode);
 
     /* 텍스트를 클릭했을 때 동작 */
-    if (click_item.parentNode.className === "text_box ") {
-      click_item.parentNode.className = "text_box off";
-      console.log(click_item.parentNode.className);
+    if (text_box.className === "text_box ") {
+      text_box.className = "text_box off";
       list_value.splice(((event_idx * 3) + 2), 1, "off");
-      console.log("list_value 2");
-      console.log(list_value);
-    } else if (click_item.parentNode.className === "text_box off") {
-      click_item.parentNode.className = "text_box ";
-      console.log(click_item.parentNode.className);
+
+    } else if (text_box.className === "text_box off") {
+      text_box.className = "text_box ";
       list_value.splice(((event_idx * 3) + 2), 1, "");
     }
 
     /* 삭제버튼을 클릭했을 때 동작 */
     if (click_item.className === "delete_item") {
-      console.log("삭제하라~~")
+      console.log("삭제하라~~");
     }
 
     /* 설정할 때 flag값도 off로 적용하면 될 것 같음.
@@ -122,7 +120,6 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log(changed_value);
     localStorage.clear("todo_list");
     localStorage.setItem("todo_list", changed_value);
-
   });
 
 
@@ -181,5 +178,6 @@ document.addEventListener("DOMContentLoaded", function () {
     /* 10. 전체 리스트의 값을 localStorage에도 저장. */
     localStorage.clear("todo_list");
     localStorage.setItem("todo_list", total_value);
+    console.log(localStorage.getItem("todo_list"));
   });
 });
