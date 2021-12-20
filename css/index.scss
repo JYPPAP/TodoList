@@ -22,26 +22,26 @@ body {
   font-size: 5rem;
   color: #222;
   text-align: center;
-  background-color: rgb(181, 214, 146);
+  background-color: #b5d692;
 }
 
 /* main */
 .main {
   padding: 20px 10px;
-  border: 2px solid rgb(163, 204, 163);
+  border: 2px solid #a3cca3;
 }
 
 .todo_wrap {
   margin-bottom: 20px;
 }
 
-#todo_input_text {
+#todo_text {
   width: 60%;
   height: 50px;
   padding-left: 10px;
   background-color: #333;
   border: none;
-  border-bottom: 1px solid rgb(192, 168, 1);
+  border-bottom: 1px solid #c0a801;
   outline: none;
 }
 
@@ -49,7 +49,7 @@ body {
   padding: 5px 10px;
   font-weight: bold;
   color: #333;
-  background-color: rgb(181, 214, 146);
+  background-color: #b5d692;
   border-radius: 25%;
 }
 
@@ -61,9 +61,9 @@ body {
 }
 
 .sort_area {
-  margin: 10px;
   display: none;
   height: 0;
+  margin: 10px;
   transition: all .3s;
 
   &:after {
@@ -90,17 +90,141 @@ body {
 }
 
 
-
 /* 값 출력 */
 .list_wrap {
-  padding-top: 20px;
-  border-top: 1px solid rgb(163, 204, 163);
+  border-top: 1px solid #a3cca3;
+  min-height: 100px;
+  max-height: 600px;
+  overflow-x: hidden;
+  &::-webkit-scrollbar {
+    width: 10px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: #a3cca3;
+    border-radius: 10px;
+  }
+  &::-webkit-scrollbar-track {
+    background-color: #9aafdd;
+    border-radius: 10px;
+  }
 }
 
 // #list {}
+/* css를 만들 때,
+멀티클래스를 이용해서 만들기.
+1. .item.normal 일 때 (첫 로딩시, 기본적으로 유지) 
+item에 마우스를 올렸을 때 x 버튼이 보이고, 배경색을 바꿀 수 있도록 만들기
+2. item.remove 일 때( 삭제버튼을 클릭했을 때)
 
-// .item {}
-// .set_btn_wrap {
-//   .delete_item {}
-//   .che
+
+*/
+
+/* TEST 용 색 */
+// .item {
+//   background-color: #555;
 // }
+
+// .btn_box {
+//   background-color: #999;
+// }
+
+// .text_box {
+//   background-color: #777;
+// }
+
+// .icon_box {
+//   background-color: #bbb;
+// }
+
+.item {
+  height: 80px;
+  padding: 5px 0;
+  overflow: hidden;
+  border-bottom: 1px solid rgb(181, 214, 146);
+
+  &:after {
+    display: block;
+    clear: both;
+    content: '';
+  }
+
+  /* 1. .item.normal 일 때 (첫 로딩시, 기본적으로 유지)
+  item에 마우스를 올렸을 때 x 버튼이 보이고, 배경색을 바꿀 수 있도록 만들기
+  */
+  &.normal {
+    .delete_item {
+      display: block;
+      visibility: hidden;
+    }
+    &:hover {
+      background-color: rgb(121, 42, 42);
+      .delete_item {
+        visibility: visible;
+      }
+    }
+
+  }
+}
+
+.btn_box {
+  float: left;
+  width: 8%;
+
+  &:after {
+    display: block;
+    clear: both;
+    content: '';
+  }
+}
+
+.delete_item {
+  display: none;
+  width: 100%;
+  height: 70px;
+  text-align: center;
+  background-color: transparent;
+  border: none;
+}
+
+.select_item {
+  display: none;
+}
+
+.text_box {
+  float: left;
+  width: 70%;
+  height: 70px;
+
+  h4 {
+    max-height: 2rem;
+    padding: 10px 0 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  p {
+    padding-bottom: 100%;
+  }
+
+  &.off {
+    h4, p {
+      text-decoration: line-through;
+      color: #666;
+    }
+  }
+}
+
+.icon_box {
+  float: left;
+  width: 20%;
+  height: 70px;
+
+  >* {
+    float: left;
+    width: 33.3333%;
+    height: 70px;
+    line-height: 70px;
+    text-align: center;
+    background-color: rgb(181, 214, 146);
+
+  }
+}

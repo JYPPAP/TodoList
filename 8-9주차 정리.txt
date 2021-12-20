@@ -1,0 +1,35 @@
+FrontEnd 7차과제 : TodoList 제작
+
+해당 TodoList WebApp을 제작한다.
+-	JavaScript사용 (jQuery를 사용 배제)
+-	브라우저 저장소를 사용(LocalStorage)하여 데이터를 다루고 페이지 전환 시 값을 일치시켜야 한다.
+-	디자인이나 UI 구성은 본인이 자유롭게 만든다.
+
+
+[ Todo-List 동작구현 ]
+1.	텍스트 영역 클릭 시 텍스트 line-through 처리
+ 
+2.	추가기능
+ 
+3.	삭제기능
+-	리스트 마우스 오버 시 삭제 아이콘 표시
+ 
+-	삭제버튼 클릭 시 다중 삭제 기능 
+: 각 리스트 체크박스 표시
+: 추가, 정렬 버튼 비활성화
+: 삭제버튼 재 클릭시 체크된 리스트 삭제 후 체크박스 숨기기
+4.	정렬
+-	오른쪽 영역 클릭 시 오른쪽에 순서변경 및 체크 아이콘 표시 : 각각의 순서를 바꿀 수 있도록 구성
+ 
+-	정렬 버튼 클릭 시
+: 각 리스트 라디오버튼 표시
+: 추가, 정렬 버튼 비활성화 및 UI 변경
+: 정렬버튼 클릭시 체크된 리스트를 입력한 숫자 위치로 이동 후 라디오버튼 숨기기 및 UI 초기화
+
+리스트
+https://freefrontend.com/css-lists/
+https://codepen.io/milanraring/pen/QWbqBGo
+https://codepen.io/gnevin/pen/axNVex
+https://codepen.io/equinusocio/pen/OqpBKJ
+https://codepen.io/_Sabine/pen/mvWxeK
+https://codepen.io/INapta/pen/KJWJOL
