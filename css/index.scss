@@ -96,45 +96,21 @@ body {
   min-height: 100px;
   max-height: 600px;
   overflow-x: hidden;
+
   &::-webkit-scrollbar {
     width: 10px;
   }
+
   &::-webkit-scrollbar-thumb {
     background-color: #a3cca3;
     border-radius: 10px;
   }
+
   &::-webkit-scrollbar-track {
     background-color: #9aafdd;
     border-radius: 10px;
   }
 }
-
-// #list {}
-/* css를 만들 때,
-멀티클래스를 이용해서 만들기.
-1. .item.normal 일 때 (첫 로딩시, 기본적으로 유지) 
-item에 마우스를 올렸을 때 x 버튼이 보이고, 배경색을 바꿀 수 있도록 만들기
-2. item.remove 일 때( 삭제버튼을 클릭했을 때)
-
-
-*/
-
-/* TEST 용 색 */
-// .item {
-//   background-color: #555;
-// }
-
-// .btn_box {
-//   background-color: #999;
-// }
-
-// .text_box {
-//   background-color: #777;
-// }
-
-// .icon_box {
-//   background-color: #bbb;
-// }
 
 .item {
   height: 80px;
@@ -148,21 +124,52 @@ item에 마우스를 올렸을 때 x 버튼이 보이고, 배경색을 바꿀 �
     content: '';
   }
 
-  /* 1. .item.normal 일 때 (첫 로딩시, 기본적으로 유지)
-  item에 마우스를 올렸을 때 x 버튼이 보이고, 배경색을 바꿀 수 있도록 만들기
-  */
+  &:first-child {
+    .up_item {
+      display: none;
+    }
+
+    .down_item {
+      width: 66%;
+    }
+  }
+
+  &:last-child {
+    .up_item {
+      width: 66%;
+    }
+
+    .down_item {
+      display: none;
+    }
+  }
+
+  /* 기본 상태. */
   &.normal {
     .delete_item {
       display: block;
       visibility: hidden;
     }
+
     &:hover {
       background-color: rgb(121, 42, 42);
+
       .delete_item {
         visibility: visible;
       }
     }
+  }
 
+  &.remove {
+    .select_item {
+      display: block;
+    }
+  }
+
+  &.sort {
+    .sort_item {
+      display: block;
+    }
   }
 }
 
@@ -186,8 +193,12 @@ item에 마우스를 올렸을 때 x 버튼이 보이고, 배경색을 바꿀 �
   border: none;
 }
 
-.select_item {
+.select_item, .sort_item {
   display: none;
+  position: relative;
+  top: 25px;
+  left: 10px;
+  text-align: center;
 }
 
 .text_box {
@@ -201,12 +212,15 @@ item에 마우스를 올렸을 때 x 버튼이 보이고, 배경색을 바꿀 �
     overflow: hidden;
     text-overflow: ellipsis;
   }
+
   p {
     padding-bottom: 100%;
   }
 
   &.off {
-    h4, p {
+
+    h4,
+    p {
       text-decoration: line-through;
       color: #666;
     }
@@ -218,13 +232,21 @@ item에 마우스를 올렸을 때 x 버튼이 보이고, 배경색을 바꿀 �
   width: 20%;
   height: 70px;
 
-  >* {
+  &.on button {
+    visibility: visible;
+  }
+
+  button {
+    // visibility: hidden;
     float: left;
     width: 33.3333%;
     height: 70px;
     line-height: 70px;
     text-align: center;
     background-color: rgb(181, 214, 146);
-
+  }
+  
+  .check_item {
+    float: right;
   }
 }

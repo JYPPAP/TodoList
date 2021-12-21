@@ -1,127 +1,149 @@
 document.addEventListener("DOMContentLoaded", function () {
   /* 필요한 전역 변수들 */
-  doc = document;
-  var list_wrap = doc.getElementsByClassName(".todo_wrap"),
+  var doc = document,
     insert_btn = doc.getElementById("insert_btn"),
     remove_btn = doc.getElementById("remove_btn"),
     sort_btn = doc.getElementById("sort_btn"),
+    sort_btn_on = doc.getElementById("sort_btn_on"),
     list = doc.getElementById("list"),
-    delete_item = doc.getElementsByClassName("delete_item"),
+    item = list.children,
     todo_list,
+    list_data = 3,
     list_value,
-    item = list.children;
+    btn_flag = false,
+    icon_box = doc.getElementsByClassName("icon_box"),
+    icon_flag = false;
+
 
   /* 값 입력. */
   function set_list(text, time, flag) {
-    var set_text = '<li class="item normal">\n<div class="btn_box">\n<button class="delete_item">❌</button>\n<input type="checkbox" name="" class="select_item">\n</div>\n<div class="text_box ' + flag + '">\n<h4 class="input_text">' + text + '</h4>\n<p>work / ' + time + '</p>\n</div>\n<div class="icon_box">\n<button class="up_item">🔺</button>\n<button class="down_item">🔻</button>\n<button class="check_item">✅</button>\n</div>\n</li>';
+    var set_text = '<li class="item normal"><div class="btn_box"><button class="delete_item">❌</button><input type="checkbox" class="select_item"><input type="radio" name="sort" class="sort_item"></div><div class="text_box ' + flag + '"><h4 class="input_text">' + text + '</h4><p>work / ' + time + '</p></div><div class="icon_box"><button class="up_item">🔺</button><button class="down_item">🔻</button><button class="check_item">✅</button></div></li>';
     return set_text;
   }
 
-  /* 초기화 함수 */
-  (function init_page() {
-    /* 1. 처음 실행될 때 localStorage에서 값을 가져오기. */
+  /* 리스트 생성 및 초기화 */
+  function init_page() {
+
+    insert_btn.className = "btn";
+    remove_btn.className = "btn";
+    sort_btn.className = "btn";
+    btn_flag = false;
+
+    /* localStorage에서 값을 가져오기. */
     todo_list = localStorage.getItem('todo_list');
 
-    if (typeof (todo_list) === "string") {
+    if (todo_list) {
       /* 값을 가져왔을 때 */
-      list_value = (todo_list.split(/[\|\;]/g)).slice(0, -1);
-      console.log(list_value);
-      if (list_value.length % 3 !== 0) {
+      list_value = todo_list.split(/[\|]/g);
+
+      if (list_value.length % list_data !== 0) {
         /* 가져온 값에 문제가 있을 때 */
-        alert("이런! 저장된 기록에 문제가 발생했습니다.\n기록을 초기화합니다.");
+        console.log("이런! 저장된 기록에 문제가 발생했습니다.\n기록을 초기화합니다.");
+        console.log(list_value);
+        // alert("이런! 저장된 기록에 문제가 발생했습니다.\n기록을 초기화합니다.");
         localStorage.clear("todo_list");
         return;
       }
+
     } else {
       /* 값이 없을 때 */
-      console.log("값이 없음.");
       todo_list = "";
+      list.innerHTML = "";
       return;
     }
     /* 최종 값 추가. */
     var init_text = "";
     for (var i = 0; i < list_value.length / 3; i++) {
-      var list_text = list_value[(i * 3) + 1],
-        list_time = list_value[(i * 3)],
-        list_flag = list_value[(i * 3) + 2];
+      var list_text = list_value[(i * list_data) + 1],
+        list_time = list_value[(i * list_data)],
+        list_flag = list_value[(i * list_data) + 2];
 
       init_text += set_list(list_text, list_time, list_flag);
     }
     list.innerHTML = init_text;
+
+    if (icon_flag) {
+      for (var i = 0; i < icon_box.length; i++) {
+        icon_box[i].className = "icon_box on";
+      }
+    }
     /* 테스트용 clear */
     // localStorage.clear("todo_list");
-  })();
+  };
+  init_page();
 
-  function save_list(text, time) {
-    /* #### 삭제
-    클릭한 값의 시간을 확인해서 제거... 초까지 같으면 어떻게 하지?
-    클릭한 요소의 인덱스값을 확인.
-    시간이 전부 동일하다고 할 때, 클릭한 요소의 인덱스값은 충분한 검색 요소.
-    인덱스 확인 인덱스 *2, 인덱스 *2+1의 값이 지워야 할 대상.
-    *** *** *** *** *** *** *** *** *** *** *** *** ***
-    추가와 삭제할 때 중복되는지 체크 후 사용여부 판단하기.
-    */
-  }
-  /* 클릭한 요소의 인덱스 */
-  function getElementIndex(target) {
-    var index = 0;
-    while ((target = target.previousElementSibling) != null) {
-      index++;
+  /* 리스트 이동관련 함수 */
+  function move_list(target, point) {
+    var temp_list = list_value.slice((target) * list_data, ((target) * list_data) + list_data);
+
+    for (var i = 0; i < temp_list.length; i++) {
+      list_value[(target) * list_data + i] = list_value[(target + point) * list_data + i];
+      list_value[(target + point) * list_data + i] = temp_list[i];
     }
-    return index;
   }
 
   /* LIST 클릭시 동작. */
   list.addEventListener("click", function (e) {
-    /* 생각해보니 line-through 처리한 값도 저장이 되어야하는데 그건 또 어떻게하지?
-    추가해야 할 값.
-    1. text_box에 추가될 off 클래스
-    2. 
-     */
-    console.log(e);
+
     var click_item = e.target,
-        event_item = e.path[2],
-        text_box = click_item.parentNode,
-    /* 클릭한 요소의 item 인덱스 번호 */
-        event_idx = getElementIndex(event_item);
+      event_item = click_item.parentNode.parentNode,
+      text_box = click_item.parentNode,
+      event_idx = 0;
+
+    if (event_item.className !== "item normal") {
+      return;
+    }
+
     todo_list = localStorage.getItem('todo_list');
-    list_value = (todo_list.split(/[\|\;]/g)).slice(0, -1);
-    console.log(event_idx);
+    list_value = todo_list.split(/[\|]/g);
 
-    /* 입력값용 배열 */
-    console.log("list_value 1");
-    console.log(list_value);
-    console.log(click_item.parentNode);
-
-    /* 텍스트를 클릭했을 때 동작 */
-    if (text_box.className === "text_box ") {
-      text_box.className = "text_box off";
-      list_value.splice(((event_idx * 3) + 2), 1, "off");
-
-    } else if (text_box.className === "text_box off") {
-      text_box.className = "text_box ";
-      list_value.splice(((event_idx * 3) + 2), 1, "");
+    /* 클릭한 요소의 인덱스 */
+    while ((event_item = event_item.previousElementSibling) != null) {
+      event_idx++;
+    }
+    /* 텍스트 클릭 토글 */
+    switch (text_box.className) {
+      case "text_box on":
+        // icon_flag = false;
+        text_box.className = "text_box off";
+        list_value[(event_idx * list_data) + 2] = "off";
+        break;
+      case "text_box off":
+        // icon_flag = false;
+        text_box.className = "text_box on";
+        list_value[(event_idx * list_data) + 2] = "on";
+        break;
     }
 
-    /* 삭제버튼을 클릭했을 때 동작 */
-    if (click_item.className === "delete_item") {
-      console.log("삭제하라~~");
+    /* 버튼 클릭시 동작 */
+    console.log(e);
+    console.log(click_item);
+    console.log(click_item.className);
+    switch (click_item.className) {
+      case "delete_item":
+        list_value.splice((event_idx * list_data), list_data);
+        break;
+
+      case "icon_box":
+        icon_flag = true;
+        console.log("icon_box Clicked");
+        break;
+
+      case "up_item":
+        move_list(event_idx, -1);
+        break;
+
+      case "down_item":
+        move_list(event_idx, +1);
+        break;
     }
 
-    /* 설정할 때 flag값도 off로 적용하면 될 것 같음.
-    배열로 만들고 인덱스 *3 +2번째의 값을 off로 바꾸기.
-    
-    */
-    /* 최종 저장 */
-    var changed_value ="";
-    for(var i = 0; i <list_value.length/3; i++) {
-      changed_value += list_value[i*3] + "|" + list_value[(i*3)+1] + "|" + list_value[(i*3)+2] + ";";
-    }
-    console.log(changed_value);
-    localStorage.clear("todo_list");
+    /* localStorage 변경 */
+    var changed_value = list_value.join("|");
     localStorage.setItem("todo_list", changed_value);
-  });
 
+    init_page();
+  });
 
   /* 추가버튼을 클릭했을 때 해야 할 동작 */
   insert_btn.addEventListener("click", function () {
@@ -131,53 +153,161 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     /* 2. 지역변수 */
-    var todo_text = doc.getElementById("todo_text");
-    var text_value = todo_text.value;
-    var now_time = new Date();
-    var formatted_date = now_time.getFullYear() + "/" + (("0" + (now_time.getMonth() + 1)).slice(-2)) + "/" + now_time.getDate() + " " + (("0" + now_time.getHours()).slice(-2)) + ":" + (("0" + now_time.getMinutes()).slice(-2)) + ":" + (("0" + now_time.getSeconds()).slice(-2));
+    var todo_text = doc.getElementById("todo_text"),
+      text_value = todo_text.value,
+      test_text = text_value.replace(/ /g, ""),
+      now_time = new Date(),
+      reg = /[\/;|`\\]/gi,
+      formatted_date = now_time.getFullYear() + "/" + (("0" + (now_time.getMonth() + 1)).slice(-2)) + "/" + now_time.getDate() + " " + (("0" + now_time.getHours()).slice(-2)) + ":" + (("0" + now_time.getMinutes()).slice(-2)) + ":" + (("0" + now_time.getSeconds()).slice(-2));
 
     /* 3. input 창 내부에 값이 정상적으로 들어있는지 확인
       - 값이 없으면 경고 */
-    if (text_value === "") {
+    if (test_text.length === 0) {
       // window.alert("값을 입력해주세요.");
       // return;
-      // console.log("테스트용 임시 값 삽입, 나중에 지우기");
-      text_value = "TEST";
+      // console.log("테스트용 임시 값 삽입");
+      text_value = (("0" + now_time.getMinutes()).slice(-2)) + ":" + (("0" + now_time.getSeconds()).slice(-2)) + ":" + now_time.getMilliseconds();
     }
 
     /* 4. 가져온 값에서 특수문자 제거하기. */
-    var reg = /[\/;|`\\]/gi;
-
     if (reg.test(text_value)) {
       text_value = text_value.replace(reg, "");
     }
 
-    /* 5. 추가할 값 문자열로 만들기 */
-    var item_text = set_list(text_value, formatted_date, "");
-
-    /* 6. 기존의 리스트 따로 저장하기 */
-    current_list = list.innerHTML;
-
-    /* 7. 전체 값 출력하기 */
-    list.innerHTML = item_text + current_list;
-
-    /* 8. localStorage에 저장할 값의 형태로 생성. */
-    var save_value = formatted_date + "|" + text_value + "|" + "" + ";";
+    /* 5. localStorage에 저장할 값의 형태로 생성. */
+    var save_value = formatted_date + "|" + text_value + "|" + "on";
     todo_list = localStorage.getItem('todo_list');
-    if (todo_list === null) {
+    if (todo_list) {
       /* 값이 없을 때 실행 */
-      var total_value = save_value;
+      var total_value = save_value + "|" + todo_list;
     } else {
-      /* 값이 한 짝이라도 있을 때 실행 */
-      var total_value = save_value + todo_list;
+      /* 값이 있을 때 실행 */
+      var total_value = save_value;
     }
 
-    /* 9. input 의 텍스트 지우기 */
+    /* 6. input 의 텍스트 지우기 */
     text_value = "";
 
-    /* 10. 전체 리스트의 값을 localStorage에도 저장. */
-    localStorage.clear("todo_list");
+    /* 7. 전체 리스트의 값을 localStorage에도 저장. */
     localStorage.setItem("todo_list", total_value);
-    console.log(localStorage.getItem("todo_list"));
+    init_page();
   });
+
+  /* 삭제버튼 이벤트 */
+  remove_btn.addEventListener("click", function () {
+    /* 1. 버튼 활성화 확인 */
+    if (this.className === "btn off") {
+      return;
+    }
+    if (list.innerHTML === "") {
+      return;
+    }
+
+    /* 변수 선언 */
+    var select_item = list.getElementsByClassName("select_item"),
+      remove_count = 0;
+    // icon_flag = false;
+    todo_list = localStorage.getItem('todo_list');
+    list_value = todo_list.split(/[\|]/g);
+
+    /* 2. 버튼에 off 클래스 추가 */
+    insert_btn.className = "btn off";
+    sort_btn.className = "btn off";
+
+    var checked_array_1 = [];
+    /* 3. 모든 item의 클래스에 remove를 추가 */
+    for (var i = 0; i < item.length; i++) {
+      item[i].className = "item remove";
+      checked_array_1[i] = select_item[i].checked;
+    }
+
+    /* 체크된 아이템 삭제 */
+    for (var i = checked_array.length; i > -1; i--) {
+      if (checked_array_1[i]) {
+        list_value.splice((i * list_data), list_data);
+        remove_count++;
+      }
+    }
+
+    if (remove_count > 0) {
+      var changed_value = list_value.join("|");
+      localStorage.setItem("todo_list", changed_value);
+
+      init_page();
+      return;
+    }
+
+    if (btn_flag) {
+      btn_flag = false;
+
+      init_page();
+      return;
+    }
+    btn_flag = true;
+  });
+
+  sort_btn.addEventListener("click", function () {
+    /* 1. 버튼 활성화 확인 */
+    if (this.className === "btn off") {
+      return;
+    }
+
+    /* 변수 선언 */
+    var sort_area = (doc.getElementsByClassName("sort_area"))[0],
+      sort_item = list.getElementsByClassName("sort_item"),
+      checked_array_2 = [];
+
+    /* 버튼 연속 클릭시 토글 */
+    if (btn_flag) {
+      insert_btn.className = "btn";
+      remove_btn.className = "btn";
+      sort_btn.className = "btn";
+      sort_area.className = "sort_area";
+      btn_flag = false;
+      return;
+    }
+
+    insert_btn.className = "btn off";
+    remove_btn.className = "btn off";
+    // sort_btn.className = "btn off";
+    sort_area.className = "sort_area on";
+
+    for (var i = 0; i < item.length; i++) {
+      item[i].className = "item sort";
+      checked_array_2[i] = sort_item[i].checked;
+    }
+    console.log(checked_array_2);
+
+    /* 클릭한 요소를 확인하기.
+    현재 클릭한 요소는 checked_array_2 배열에 혼자 true 값으로 저장되어 있음.
+
+    해야 할 일
+    클릭한 요소 확인 > 완료
+    클릭한 요소의 인덱스를 변수로 저장
+
+    값은... 뭐 하나를 기본값으로 놓긴 해야 할 것 같음.
+    checked_array_2를 for문 돌려서 true 인 요소를 전달?
+
+    새로 생성된 정렬 버튼을 눌렀을 때, 어떻게 동작할 것인지.
+
+    */
+    btn_flag = true;
+  });
+  sort_btn_on.addEventListener("click", function () {
+    var sort_num = (doc.getElementById("sort_num")).value,
+      reg = /\d/;
+
+    /* 입력받은 값이 숫자인지 확인 */
+    if (!(sort_num.test(reg))) {
+      alert("숫자를 입력해주세요.");
+      sort_num = "";
+    }
+    /* 입력받은 숫자가 리스트의 전체 개수보다 작은지 확인 */
+    if (item.length <= sort_num) {
+      alert("리스트 전체 갯수보다 작은 숫자를 입력해주세요.");
+      sort_num = "";
+    }
+    console.log(sort_num);
+  });
+
 });
