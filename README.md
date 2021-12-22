@@ -8,6 +8,9 @@ list_value 에서 text, time, flag를 제외한 추가적인 값을 생성해야
 처음 문자열을 가져왔을 때 ";"를 이용해서 분리하고
 그 다음 "|"를 이용해서 분리하면 될 것 같음
 |는 분리 후 앞에서부터 값이 있는지를 확인 후 사용하면 될 것 같음.
+값을 분리할 때 2가지로 하기
+";"를 이용한 분리 = 아이템
+"|"를 이용한 분리 = 속성별 분리
 
 * 갑자기 기본적인 상태에서 icon_box가 출력되지 않는 현상이 있음.
 - 지금은 잠시 visible 처리함.
@@ -34,7 +37,8 @@ header 와 todo_wrap의 기초적인 스타일 작성(미완성)
     <button class="delete_item">❌</button>
     <!-- 삭제버튼 클릭시 출력될 체크박스 값을 어떻게 처리할 것인지.-->
     <!-- checkbox를 js를 통해서 생성할 때 name 값에 어떤걸 넣어야 할 것인지 생각을 해봐야 할 것 같음.value 값 또한 마찬가지삭제버튼, 정렬버튼 클릭 시 보여야 함.하나를 놓을지, 두 개를 놓을지 또한 고민해봐야 함.하나를 놓고, 버튼을 눌렀을 때 받은 값은 어떤 값이 체크되었는지만가져오고 받은 값을 이용해서 동작만 다르게 하는 방향으로 제작하기.텍스트 부분을 label로 묶어서 input을 눌렀을 때 css로 line-through 처리하는 방향으로 생각해봐도 좋을 것 같음. -->
-    <input type="checkbox" name="" class="select_item">
+    <input type="checkbox" name="" class="remove_item">
+    <input type="radio" name="sort" class="sort_item">
   </div>
   <div class="text_box">
     <h4 class="input_text">AM 10:00 오전 빌드</h4>

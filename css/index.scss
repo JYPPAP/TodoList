@@ -23,12 +23,14 @@ body {
   color: #222;
   text-align: center;
   background-color: #b5d692;
+  border-radius: 10px 10px 0 0;
 }
 
 /* main */
 .main {
   padding: 20px 10px;
   border: 2px solid #a3cca3;
+  border-radius: 0 0 10px 10px;
 }
 
 .todo_wrap {
@@ -62,9 +64,7 @@ body {
 
 .sort_area {
   display: none;
-  height: 0;
   margin: 10px;
-  transition: all .3s;
 
   &:after {
     display: block;
@@ -75,13 +75,16 @@ body {
 
 .sort_area.on {
   display: block;
-  height: 20px;
 }
 
 #sort_num {
   float: right;
-  width: 40px;
+  width: 100px;
   margin-top: 2px;
+  color: #000;
+  &:invalid {
+    border: 3px solid red;
+  }
 }
 
 #sort_btn_on {
@@ -97,6 +100,7 @@ body {
   max-height: 600px;
   overflow-x: hidden;
 
+  /* IE, firefox 제외 적용 */
   &::-webkit-scrollbar {
     width: 10px;
   }
@@ -161,14 +165,20 @@ body {
   }
 
   &.remove {
-    .select_item {
+    .remove_item {
       display: block;
+    }
+    .icon_box {
+      display: none;
     }
   }
 
   &.sort {
     .sort_item {
       display: block;
+    }
+    .icon_box {
+      display: none;
     }
   }
 }
@@ -193,7 +203,8 @@ body {
   border: none;
 }
 
-.select_item, .sort_item {
+.remove_item,
+.sort_item {
   display: none;
   position: relative;
   top: 25px;
@@ -232,20 +243,24 @@ body {
   width: 20%;
   height: 70px;
 
-  &.on button {
-    visibility: visible;
-  }
-
   button {
-    // visibility: hidden;
+    visibility: hidden;
     float: left;
     width: 33.3333%;
     height: 70px;
     line-height: 70px;
     text-align: center;
     background-color: rgb(181, 214, 146);
+    color: #000;
   }
-  
+
+  &.on button {
+    visibility: visible;
+  }
+  &:hover button {
+    visibility: visible;
+  }
+
   .check_item {
     float: right;
   }

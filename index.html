@@ -2,10 +2,10 @@
 <html lang="ko">
 
 <head>
+  <title>Todo-List</title>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Todo-List</title>
   <link rel="stylesheet" href="css/reset.css">
   <link rel="stylesheet" href="css/index.css?after">
   <!-- 
@@ -44,7 +44,7 @@
             <!-- 숫자가 아니면 공백으로 만들기.
               또는 숫자만 입력받게 만들기.
             -->
-            <input type="text" id="sort_num">
+            <input type="number" min="1" pattern="[0-9]+" id="sort_num">
           </div>
         </div>
         <!-- 값 출력 -->
