@@ -82,6 +82,7 @@ body {
   width: 100px;
   margin-top: 2px;
   color: #000;
+
   &:invalid {
     border: 3px solid red;
   }
@@ -156,7 +157,7 @@ body {
     }
 
     &:hover {
-      background-color: rgb(121, 42, 42);
+      background-color: #792a2a;
 
       .delete_item {
         visibility: visible;
@@ -165,18 +166,20 @@ body {
   }
 
   &.remove {
-    .remove_item {
-      display: block;
+    .text_box {
+      width: 100%;
     }
+
     .icon_box {
       display: none;
     }
   }
 
   &.sort {
-    .sort_item {
-      display: block;
+    .text_box {
+      width: 100%;
     }
+
     .icon_box {
       display: none;
     }
@@ -202,8 +205,10 @@ body {
   background-color: transparent;
   border: none;
 }
+.remove_item {
+  display: none;
+}
 
-.remove_item,
 .sort_item {
   display: none;
   position: relative;
@@ -216,6 +221,15 @@ body {
   float: left;
   width: 70%;
   height: 70px;
+  
+
+  &.remove {
+    background-color: #ff8383;
+  }
+  &.sort {
+    background-color: #c6ff6a;
+    color: #000;
+  }
 
   h4 {
     max-height: 2rem;
@@ -225,7 +239,7 @@ body {
   }
 
   p {
-    padding-bottom: 100%;
+    padding-bottom: 26px;
   }
 
   &.off {
@@ -255,9 +269,6 @@ body {
   }
 
   &.on button {
-    visibility: visible;
-  }
-  &:hover button {
     visibility: visible;
   }
 

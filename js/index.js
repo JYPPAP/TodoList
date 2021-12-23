@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
   /* 필요한 전역 변수들
   # 특이사항 :
-  $todo_list = 로컬스토리지에서 getItem으로 가져올 값
+  $todo_list = 로컬스토리지에서 가져온 값
   $list_value = todo_list를 배열로 변환한 결과
   */
   var doc = document,
@@ -31,10 +31,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function set_list(text, time, flag) {
     /* 1. 아이템의 구조 (input에 입력한 텍스트, 현재 시간, 텍스트의 line-through 유무(on/off) )를 가져와 아이템의 프레임에 입력 */
-    var set_text = '<li class="item normal"><div class="btn_box"><button class="delete_item">❌</button><input type="checkbox" class="remove_item"><input type="radio" name="sort" class="sort_item"></div><div class="text_box ' + flag + '"><h4 class="input_text">' + text + '</h4><p>' + time + '</p></div><div class="icon_box"><button class="up_item">🔺</button><button class="down_item">🔻</button><button class="check_item">✅</button></div></li>';
+    var total_item,
+      set_flag,
+      set_text,
+      set_time;
+
+    total_item = '<div class="btn_box"><button class="delete_item">❌</button><input type="checkbox" class="remove_item"><input type="radio" name="sort" class="sort_item"></div>';
+    set_flag = '<div class="text_box ' + flag + '">'
+    set_text = '<h4 class="input_text">' + text + '</h4>';
+    set_time = '<p>' + time + '</p>';
+    total_item += set_flag + set_text + set_time + '</div><div class="icon_box"><button class="up_item">🔺</button><button class="down_item">🔻</button><button class="check_item">✅</button></div>';
 
     /* 입력한 결과를 반환 */
-    return set_text;
+    return total_item;
   }
 
   /* 리스트 생성 및 초기화
@@ -80,7 +89,9 @@ document.addEventListener("DOMContentLoaded", function () {
     for (var i = 0; i < list_value.length; i++) {
       /* item_value = time|text(input)|flag 을 |로 분리한 배열 */
       item_value = list_value[i].split(/[\|]/g);
+      init_text += '<li class="item normal">';
       init_text += set_list(item_value[1], item_value[0], item_value[2]);
+      init_text += '</li>';
     }
 
     list.innerHTML = init_text;
@@ -117,7 +128,6 @@ document.addEventListener("DOMContentLoaded", function () {
   # 역할 : 클릭한 아이템을 point에 따라서 위치를 변경
   # 동작 : up_item과 down_item을 클릭했을 때 실행
   */
-
   function move_list(target, point) {
     var temp_list = list_value[target];
 
@@ -130,14 +140,13 @@ document.addEventListener("DOMContentLoaded", function () {
   # 역할 : 텍스트 토글
   # 동작 : text에 클릭이벤트가 발생했을 때 동작
   */
-
-  function text_toggle(text_box, target, toggle) {
+  function text_toggle(target, toggle) {
     /* 1. 클릭한 인덱스의 스토리지 저장값을 배열로 변환 */
     var target_item = list_value[target].split(/[\|]/g);
 
     /* 2. icon_flag 변경, text_box의 클래스 변경, 속성 변경 */
     icon_flag = false;
-    text_box.className = "text_box " + toggle;
+    // text_box.className = "text_box " + toggle;
     target_item[2] = toggle;
     target_item = target_item.join("|");
     list_value[target] = target_item;
@@ -182,7 +191,15 @@ document.addEventListener("DOMContentLoaded", function () {
       var remove_item = doc.getElementsByClassName("remove_item"),
         remove_target = remove_item[event_idx];
 
-      remove_target.checked = remove_target.checked ? false : true;
+      if (remove_target.checked) {
+        /* 체크 해제 */
+        remove_target.checked = false;
+        text_box.className = "text_box";
+      } else {
+        /* 체크 */
+        remove_target.checked = true;
+        text_box.className += " remove";
+      }
       return;
     }
 
@@ -191,16 +208,17 @@ document.addEventListener("DOMContentLoaded", function () {
       var sort_item = doc.getElementsByClassName("sort_item");
 
       sort_item[event_idx].checked = true;
+      text_box.className = "text_box sort";
       return;
     }
 
     /* 4. 텍스트 클릭 토글 */
     switch (text_box.className) {
       case "text_box on":
-        text_toggle(text_box, event_idx, "off");
+        text_toggle(event_idx, "off");
         break;
       case "text_box off":
-        text_toggle(text_box, event_idx, "on");
+        text_toggle(event_idx, "on");
         break;
     }
 
@@ -221,6 +239,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
       case "down_item":
         move_list(event_idx, +1);
+        break;
+      case "check_item":
+        icon_flag = false;
         break;
     }
 
@@ -250,7 +271,6 @@ document.addEventListener("DOMContentLoaded", function () {
   # 역할 : item 생성
   # 동작 : 추가버튼을 클릭했을 때
   */
-
   insert_btn.addEventListener("click", function () {
     /* 1. 버튼 활성화 확인 */
     if (this.className === "btn off") {
@@ -269,8 +289,10 @@ document.addEventListener("DOMContentLoaded", function () {
     /* 3. input 창 내부에 값이 정상적으로 들어있는지 확인
     - 값이 없으면 경고 */
     if (test_text.length === 0) {
-      window.alert("값을 입력해주세요.");
-      return;
+      // window.alert("값을 입력해주세요.");
+      /* test */
+      text_value = (("0" + now_time.getSeconds()).slice(-2)) + ":" + (("00" + now_time.getMilliseconds()).slice(-3));
+      // return;
     }
 
     /* 4. 가져온 값에서 특수문자 제거 */
@@ -300,7 +322,6 @@ document.addEventListener("DOMContentLoaded", function () {
   2. 삭제버튼 2번째 클릭시 선택한 item 삭제, 초기화
   # 동작 : 삭제버튼을 클릭했을 때
   */
-
   remove_btn.addEventListener("click", function () {
     /* 1. 버튼 활성화 확인, 삭제할 item이 있는지 확인
     - item이 1개일 경우 해당 아이템을 삭제 후 리스트 생성 */
@@ -354,7 +375,6 @@ document.addEventListener("DOMContentLoaded", function () {
   # 역할 : sort_area on/off
   # 동작 : 정렬버튼 클릭
   */
-
   sort_btn.addEventListener("click", function () {
     /* 버튼 활성화 확인 */
     if (this.className === "btn off") {
@@ -397,7 +417,6 @@ document.addEventListener("DOMContentLoaded", function () {
   # 역할 : 선택한 아이템 위치 변경
   # 동작 : 정렬_on 버튼 클릭 시
   */
-
   sort_btn_on.addEventListener("click", function () {
     var sort_item = doc.getElementsByName("sort"),
       checked_item,
@@ -424,11 +443,11 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     /* 입력받은 숫자가 리스트의 전체 개수보다 작은지 확인 */
-    sort_value--;
     if (sort_value > item.length) {
       alert("리스트 전체 수보다 작은 숫자를 입력해주세요.");
       return;
     }
+    sort_value--;
 
     /* 아이템 이동 */
     sort_flag = true;

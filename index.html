@@ -8,20 +8,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="css/reset.css">
   <link rel="stylesheet" href="css/index.css?after">
-  <!-- 
-  -	JavaScript사용 (jQuery를 사용 배제)
-  -	브라우저 저장소를 사용(LocalStorage)하여 데이터를 다루고 페이지 전환 시 값을 일치시켜야 한다.
-  ?? 페이지 전환은 새로고침을 해도 값이 동일하게?
-  -	디자인이나 UI 구성은 본인이 자유롭게 만든다.
-
-  1. Javascript를 활용하여 TodoList 제작
-- UI 구성능력 평가
-- JS를 통한 DOM (생성, 삭제, 수정) 능력 평가
-- Object, Array 핸들링 평가
-- 쿠키, 로컬스토리지, 세션스토리지 활용능력 평가
-- 전체적인 JavaScript 활용능력 평가
-
--->
 </head>
 
 <body>
@@ -31,19 +17,12 @@
       <div class="main">
         <!-- 입력과 버튼 -->
         <div class="todo_wrap">
-          <!-- 입력창 -->
           <input type="text" id="todo_text">
-          <!-- 추가 -->
           <button id="insert_btn" class="btn">추가</button>
-          <!-- 삭제 -->
           <button id="remove_btn" class="btn">삭제</button>
-          <!-- 정렬 -->
           <button id="sort_btn" class="btn">정렬</button>
           <div class="sort_area">
             <button id="sort_btn_on" class="btn">정렬</button>
-            <!-- 숫자가 아니면 공백으로 만들기.
-              또는 숫자만 입력받게 만들기.
-            -->
             <input type="number" min="1" pattern="[0-9]+" id="sort_num">
           </div>
         </div>
