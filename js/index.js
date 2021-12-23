@@ -131,13 +131,12 @@ document.addEventListener("DOMContentLoaded", function () {
   # 동작 : text에 클릭이벤트가 발생했을 때 동작
   */
 
-  function text_toggle(text_box, target, toggle) {
+  function text_toggle(target, toggle) {
     /* 1. 클릭한 인덱스의 스토리지 저장값을 배열로 변환 */
     var target_item = list_value[target].split(/[\|]/g);
 
     /* 2. icon_flag 변경, text_box의 클래스 변경, 속성 변경 */
     icon_flag = false;
-    text_box.className = "text_box " + toggle;
     target_item[2] = toggle;
     target_item = target_item.join("|");
     list_value[target] = target_item;
@@ -197,10 +196,10 @@ document.addEventListener("DOMContentLoaded", function () {
     /* 4. 텍스트 클릭 토글 */
     switch (text_box.className) {
       case "text_box on":
-        text_toggle(text_box, event_idx, "off");
+        text_toggle(event_idx, "off");
         break;
       case "text_box off":
-        text_toggle(text_box, event_idx, "on");
+        text_toggle(event_idx, "on");
         break;
     }
 
@@ -221,6 +220,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
       case "down_item":
         move_list(event_idx, +1);
+        break;
+
+      case "check_item":
+        icon_flag = false;
         break;
     }
 
@@ -424,11 +427,11 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     /* 입력받은 숫자가 리스트의 전체 개수보다 작은지 확인 */
-    sort_value--;
     if (sort_value > item.length) {
       alert("리스트 전체 수보다 작은 숫자를 입력해주세요.");
       return;
     }
+    sort_value--;
 
     /* 아이템 이동 */
     sort_flag = true;
