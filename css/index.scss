@@ -155,26 +155,15 @@ body {
       display: block;
       visibility: hidden;
     }
-
     &:hover {
-      background-color: #792a2a;
-
+      background-color: #5a3232;
       .delete_item {
         visibility: visible;
       }
     }
   }
 
-  &.remove {
-    .text_box {
-      width: 100%;
-    }
-
-    .icon_box {
-      display: none;
-    }
-  }
-
+  &.remove,
   &.sort {
     .text_box {
       width: 100%;
@@ -205,30 +194,24 @@ body {
   background-color: transparent;
   border: none;
 }
-.remove_item {
-  display: none;
-}
 
+.remove_item,
 .sort_item {
-  display: none;
-  position: relative;
-  top: 25px;
-  left: 10px;
-  text-align: center;
+  position: absolute;
+  left: -9999px;
 }
 
 .text_box {
   float: left;
   width: 70%;
   height: 70px;
-  
 
-  &.remove {
-    background-color: #ff8383;
+  &.remove_check {
+    background-color: #5a3232;
   }
-  &.sort {
-    background-color: #c6ff6a;
-    color: #000;
+
+  &.sort_check {
+    background-color: #374422;
   }
 
   h4 {
@@ -253,7 +236,7 @@ body {
 }
 
 .icon_box {
-  float: left;
+  float: right;
   width: 20%;
   height: 70px;
 

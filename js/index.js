@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
     sort_btn_on = doc.getElementById("sort_btn_on"),
     list = doc.getElementById("list"),
     item = list.children,
+    text_box = doc.getElementsByClassName("text_box"),
     icon_box = doc.getElementsByClassName("icon_box"),
     sort_area = (doc.getElementsByClassName("sort_area"))[0],
     sort_num = doc.getElementById("sort_num"),
@@ -22,44 +23,16 @@ document.addEventListener("DOMContentLoaded", function () {
     icon_flag = false,
     sort_flag = false;
 
-  /* 
-  # 역할 : Todo-List 아이템의 구조 생성
-  # 동작 :
-  1. 추가버튼을 클릭했을 때
-  2. 리스트를 생성 / 초기화 할 때
-  */
-
-  function set_list(text, time, flag) {
-    /* 1. 아이템의 구조 (input에 입력한 텍스트, 현재 시간, 텍스트의 line-through 유무(on/off) )를 가져와 아이템의 프레임에 입력 */
-    var total_item,
-      set_flag,
-      set_text,
-      set_time;
-
-    total_item = '<div class="btn_box"><button class="delete_item">❌</button><input type="checkbox" class="remove_item"><input type="radio" name="sort" class="sort_item"></div>';
-    set_flag = '<div class="text_box ' + flag + '">'
-    set_text = '<h4 class="input_text">' + text + '</h4>';
-    set_time = '<p>' + time + '</p>';
-    total_item += set_flag + set_text + set_time + '</div><div class="icon_box"><button class="up_item">🔺</button><button class="down_item">🔻</button><button class="check_item">✅</button></div>';
-
-    /* 입력한 결과를 반환 */
-    return total_item;
-  }
-
   /* 리스트 생성 및 초기화
   # 역할 : 
-  1. localStorage가 수정되면 리스트를 새롭게 출력.
+  1. 리스트 다시 생성
   2. 추가, 삭제, 정렬 버튼 초기화
 
-  # 동작 : 
+  # 동작 : 아이템의 수에 변화가 생기면 
   1. X버튼을 클릭했을 때
-  2. 텍스트를 클릭했을 때
-  3. 정렬 아이콘을 클릭해서 정렬했을 때
-  4. 추가버튼을 클릭했을 때
-  5. 삭제버튼을 클릭했을 때 삭제할 아이템이 있는 경우
-  6. 정렬버튼을 클릭했을 때 정렬할 아이템이 있는 경우
-    */
-
+  2. 추가버튼을 클릭했을 때
+  3. 삭제버튼을 클릭했을 때 삭제할 아이템이 있는 경우
+  */
   function init_page() {
     /* 변수 선언 */
     var init_text = "",
@@ -87,21 +60,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
     /* 4. 반복문을 이용해 총 량/ 속성의 수 만큼 추가 */
     for (var i = 0; i < list_value.length; i++) {
-      /* item_value = time|text(input)|flag 을 |로 분리한 배열 */
+      /* time|text(input)|flag가 한 개의 값 */
       item_value = list_value[i].split(/[\|]/g);
       init_text += '<li class="item normal">';
       init_text += set_list(item_value[1], item_value[0], item_value[2]);
       init_text += '</li>';
     }
-
     list.innerHTML = init_text;
-
-    /* 5. icon_box가 활성화 되어있었다면 icon_box 활성화 */
-    if (icon_flag) {
-      for (var i = 0; i < icon_box.length; i++) {
-        icon_box[i].className = "icon_box on";
-      }
-    }
 
     /* 6. 정렬버튼이 활성화 되어있었다면 정렬버튼 활성화 */
     if (sort_flag) {
@@ -119,153 +84,8 @@ document.addEventListener("DOMContentLoaded", function () {
     if (item.length > 1) {
       sort_btn.className = "btn";
     }
-    /* 테스트용 clear */
-    // localStorage.clear("todo_list");
   };
   init_page();
-
-  /*
-  # 역할 : 클릭한 아이템을 point에 따라서 위치를 변경
-  # 동작 : up_item과 down_item을 클릭했을 때 실행
-  */
-  function move_list(target, point) {
-    var temp_list = list_value[target];
-
-    icon_flag = true;
-    list_value[target] = list_value[target + point];
-    list_value[target + point] = temp_list;
-  }
-
-  /*
-  # 역할 : 텍스트 토글
-  # 동작 : text에 클릭이벤트가 발생했을 때 동작
-  */
-  function text_toggle(target, toggle) {
-    /* 1. 클릭한 인덱스의 스토리지 저장값을 배열로 변환 */
-    var target_item = list_value[target].split(/[\|]/g);
-
-    /* 2. icon_flag 변경, text_box의 클래스 변경, 속성 변경 */
-    icon_flag = false;
-    // text_box.className = "text_box " + toggle;
-    target_item[2] = toggle;
-    target_item = target_item.join("|");
-    list_value[target] = target_item;
-  }
-
-  /*
-  # 역할 : 이벤트 발생시 로컬스토리지 수정 후 init_page 호출
-  # 동작 : #list에 클릭이벤트가 발생했을 때 동작
-  */
-
-  list.addEventListener("click", function (e) {
-    /* 1. 클릭한 요소를 e.target, 조상요소를 event_item에 저장 */
-    var click_item = e.target,
-      event_item = click_item.parentNode.parentNode,
-      check_item = event_item,
-      text_box = click_item.parentNode,
-      event_idx = 0;
-
-    /*
-    todo 
-    1. remove와 sort 상태일 때 테두리 클릭시 이상현상 있음.
-    강제로 normal로 변환됨.
-    */
-
-    if (check_item.className === "list_wrap") {
-      event_item = click_item;
-      check_item = click_item;
-    }
-    if (check_item === list) {
-      event_item = click_item.parentNode;
-      check_item = click_item.parentNode;
-    }
-
-
-    /* 3. 클릭한 요소의 인덱스 찾기 */
-    while ((event_item = event_item.previousElementSibling) != null) {
-      event_idx++;
-    }
-
-    /* remove 상태에서 텍스트 클릭시 체크 */
-    if (check_item.className === "item remove") {
-      var remove_item = doc.getElementsByClassName("remove_item"),
-        remove_target = remove_item[event_idx];
-
-      if (remove_target.checked) {
-        /* 체크 해제 */
-        remove_target.checked = false;
-        text_box.className = "text_box";
-      } else {
-        /* 체크 */
-        remove_target.checked = true;
-        text_box.className += " remove";
-      }
-      return;
-    }
-
-    /* sort 상태에서 텍스트 클릭시 체크 */
-    if (check_item.className === "item sort") {
-      var sort_item = doc.getElementsByClassName("sort_item");
-
-      sort_item[event_idx].checked = true;
-      text_box.className = "text_box sort";
-      return;
-    }
-
-    /* 4. 텍스트 클릭 토글 */
-    switch (text_box.className) {
-      case "text_box on":
-        text_toggle(event_idx, "off");
-        break;
-      case "text_box off":
-        text_toggle(event_idx, "on");
-        break;
-    }
-
-    /* 5. 버튼 클릭시 동작 */
-    switch (click_item.className) {
-      case "delete_item":
-        list_value.splice((event_idx), 1);
-        break;
-
-      case "icon_box":
-        // todo icon_box 선택 안됌.
-        icon_flag = true;
-        break;
-
-      case "up_item":
-        move_list(event_idx, -1);
-        break;
-
-      case "down_item":
-        move_list(event_idx, +1);
-        break;
-      case "check_item":
-        icon_flag = false;
-        break;
-    }
-
-    console.log("##############################");
-    console.log("e");
-    console.log(e);
-    console.log("e.target");
-    console.log(e.target);
-    console.log("event_item");
-    console.log(event_item);
-    console.log("check_item");
-    console.log(check_item);
-    console.log("text_box");
-    console.log(text_box);
-    console.log("text_box.className");
-    console.log(text_box.className);
-    console.log("##############################");
-
-    /* 6. localStorage 변경 */
-    changed_value = list_value.join(";");
-    localStorage.setItem("todo_list", changed_value);
-
-    init_page();
-  });
 
   /*
   # 역할 : item 생성
@@ -290,7 +110,8 @@ document.addEventListener("DOMContentLoaded", function () {
     - 값이 없으면 경고 */
     if (test_text.length === 0) {
       // window.alert("값을 입력해주세요.");
-      /* test */
+      /*
+      todo console.log("아래의 테스트용 값 지우기") */
       text_value = (("0" + now_time.getSeconds()).slice(-2)) + ":" + (("00" + now_time.getMilliseconds()).slice(-3));
       // return;
     }
@@ -304,6 +125,7 @@ document.addEventListener("DOMContentLoaded", function () {
     save_value = formatted_date + "|" + text_value + "|" + "on";
 
     /* 6. 기존의 값이 있는지 확인 후 통합 */
+    todo_list = localStorage.getItem("todo_list");
     if (todo_list) {
       var total_value = save_value + ";" + todo_list;
     } else {
@@ -312,6 +134,102 @@ document.addEventListener("DOMContentLoaded", function () {
 
     /* 7. 전체 리스트의 값을 localStorage에 저장 */
     localStorage.setItem("todo_list", total_value);
+    init_page();
+  });
+
+  /*
+  # 역할 : 이벤트 발생시 로컬스토리지 수정 후 init_page 호출
+  # 동작 : #list에 클릭이벤트가 발생했을 때 동작
+  */
+  list.addEventListener("click", function (e) {
+    /* 1. 클릭한 요소를 e.target, 조상요소를 event_item에 저장 */
+    var click_item = e.target,
+      event_item = click_item.parentNode.parentNode,
+      check_item = event_item,
+      p_target = click_item.parentNode,
+      event_idx = 0;
+
+    /* 클릭한 요소가 item일 경우 */
+    if (click_item === list) {
+      return;
+    }
+
+    if (p_target === list) {
+      return;
+    }
+
+    /* 3. 클릭한 요소의 인덱스 찾기 */
+    while ((event_item = event_item.previousElementSibling) != null) {
+      event_idx++;
+    }
+
+    /* remove 상태에서 텍스트 클릭시 체크 */
+    if (check_item.className === "item remove") {
+      var remove_item = doc.getElementsByClassName("remove_item"),
+        remove_target = remove_item[event_idx];
+
+      if (remove_target.checked) {
+        /* 체크 해제 */
+        remove_target.checked = false;
+        p_target.className = p_target.className.replace("remove_check", "");
+      } else {
+        /* 체크 */
+        remove_target.checked = true;
+        p_target.className += " remove_check";
+      }
+      return;
+    }
+
+    /* sort 상태에서 텍스트 클릭시 체크 */
+    if (check_item.className === "item sort") {
+      var sort_item = doc.getElementsByClassName("sort_item");
+
+      for (var i = 0; i < text_box.length; i++) {
+        text_box[i].className = text_box[i].className.replace("sort_check", "");
+      }
+      sort_item[event_idx].checked = true;
+      p_target.className += " sort_check";
+      return;
+    }
+
+    /* 4. 텍스트 클릭 토글 */
+    if (p_target.className === "text_box on") {
+      toggle_text(p_target, event_idx, "off");
+      return
+    }
+    if (p_target.className === "text_box off") {
+      toggle_text(p_target, event_idx, "on");
+      return
+    }
+
+    /* 5. 버튼 클릭시 동작 */
+    switch (click_item.className) {
+      case "delete_item":
+        list_value.splice((event_idx), 1);
+        break;
+
+      case "icon_box":
+        icon_flag = true;
+        toggle_icon();
+        return;
+
+      case "up_item":
+        move_list(event_idx, event_idx - 1);
+        return;
+
+      case "down_item":
+        move_list(event_idx, event_idx + 1);
+        return;
+
+      case "check_item":
+        icon_flag = false;
+        toggle_icon();
+        break;
+    }
+
+    /* 6. localStorage 변경 */
+    changed_value = list_value.join(";");
+    localStorage.setItem("todo_list", changed_value);
 
     init_page();
   });
@@ -351,7 +269,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     /* 삭제한 아이템이 있을 때 */
-    if (remove_array.length > 1) {
+    if (remove_array.length > 0) {
       for (var i = remove_array.length - 1; i > -1; i--) {
         list_value.splice((remove_array[i]), 1);
       }
@@ -403,6 +321,7 @@ document.addEventListener("DOMContentLoaded", function () {
       sort_area.className = "sort_area";
       for (var i = 0; i < item.length; i++) {
         item[i].className = "item normal";
+        text_box[i].className = text_box[i].className.replace("sort_check", "");
       }
       btn_flag = false;
       sort_flag = false;
@@ -420,7 +339,6 @@ document.addEventListener("DOMContentLoaded", function () {
   sort_btn_on.addEventListener("click", function () {
     var sort_item = doc.getElementsByName("sort"),
       checked_item,
-      temp_sort = [],
       sort_value = sort_num.value;
 
     /* sort_item이 체크가 되어있는지 확인 */
@@ -450,15 +368,86 @@ document.addEventListener("DOMContentLoaded", function () {
     sort_value--;
 
     /* 아이템 이동 */
-    sort_flag = true;
-    temp_sort = list_value[checked_item];
-    list_value[checked_item] = list_value[sort_value];
-    list_value[sort_value] = temp_sort;
+    move_list(checked_item, sort_value);
+  });
 
-    /* 변경값 저장 */
+  /* 
+  # 역할 : Todo-List 아이템의 구조 생성
+  # 동작 :
+  1. 추가버튼을 클릭했을 때
+  2. 리스트를 생성 / 초기화 할 때
+  */
+  function set_list(text, time, flag) {
+    /* 1. 아이템의 구조 (input에 입력한 텍스트, 현재 시간, 텍스트의 line-through 유무(on/off) )를 가져와 아이템의 프레임에 입력 */
+    var total_item = "",
+      set_flag,
+      set_text,
+      set_time;
+
+    total_item = '<div class="btn_box"><button class="delete_item">❌</button><input type="checkbox" class="remove_item"><input type="radio" name="sort" class="sort_item"></div>';
+    set_flag = '<div class="text_box ' + flag + '">'
+    set_text = '<h4 class="input_text">' + text + '</h4>';
+    set_time = '<p>' + time + '</p>';
+    total_item += set_flag + set_text + set_time + '</div>';
+    total_item += '<div class="icon_box"><button class="up_item">🔺</button><button class="down_item">🔻</button><button class="check_item">✅</button></div>';
+
+    /* 입력한 결과를 반환 */
+    return total_item;
+  }
+
+  /*
+  # 역할 : 클릭한 아이템을 point에 따라서 위치를 변경
+  # 동작 : up_item과 down_item을 클릭했을 때 실행
+  */
+  function move_list(target, point) {
+    var temp_list = list_value[target],
+      target_value = list_value[target].split(/[\|]/g),
+      point_value = list_value[point].split(/[\|]/g);
+
+    /* 아이콘 박스 표시, 리스트의 값 변경. */
+    list_value[target] = list_value[point];
+    list_value[point] = temp_list;
+
+    /* 리스트 값 변경. */
+    item[point].innerHTML = set_list(target_value[1], target_value[0], target_value[2]);
+    item[target].innerHTML = set_list(point_value[1], point_value[0], point_value[2]);
+    toggle_icon();
+
+    changed_value = list_value.join(";");
+    localStorage.setItem("todo_list", changed_value);
+  }
+
+  /* 아이콘 상자 토글 */
+  function toggle_icon() {
+    if (icon_flag) {
+      for (var i = 0; i < icon_box.length; i++) {
+        icon_box[i].className = "icon_box on";
+      }
+    } else {
+      for (var i = 0; i < icon_box.length; i++) {
+        icon_box[i].className = "icon_box";
+      }
+    }
+  }
+
+  /*
+  # 역할 : 텍스트 토글
+  # 동작 : text에 클릭이벤트가 발생했을 때 동작
+  */
+  function toggle_text(p_target, target, toggle) {
+    /* 1. 클릭한 인덱스의 스토리지 저장값을 배열로 변환 */
+    var target_item = list_value[target].split(/[\|]/g);
+
+    /* 2. text_box 상태 변경, 로컬스토리지 저장값 변경 */
+    icon_flag = false;
+    p_target.className = "text_box " + toggle;
+
+    target_item[2] = toggle;
+    target_item = target_item.join("|");
+    list_value[target] = target_item;
+
     changed_value = list_value.join(";");
     localStorage.setItem("todo_list", changed_value);
 
-    init_page();
-  });
+  }
 });
