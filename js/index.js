@@ -10,18 +10,19 @@ document.addEventListener("DOMContentLoaded", function () {
     remove_btn = doc.getElementById("remove_btn"),
     sort_btn = doc.getElementById("sort_btn"),
     sort_btn_on = doc.getElementById("sort_btn_on"),
-    list = doc.getElementById("list"),
-    item = list.children,
-    text_box = doc.getElementsByClassName("text_box"),
-    icon_box = doc.getElementsByClassName("icon_box"),
     sort_area = (doc.getElementsByClassName("sort_area"))[0],
     sort_num = doc.getElementById("sort_num"),
+    list = doc.getElementById("list"),
+    item = list.children,
+    text_box = list.getElementsByClassName("text_box"),
+    icon_box = list.getElementsByClassName("icon_box"),
     todo_list,
     list_value,
     changed_value = "",
     btn_flag = false,
-    icon_flag = false,
     sort_flag = false;
+
+  init_page();
 
   /* 리스트 생성 및 초기화
   # 역할 : 
@@ -85,7 +86,6 @@ document.addEventListener("DOMContentLoaded", function () {
       sort_btn.className = "btn";
     }
   };
-  init_page();
 
   /*
   # 역할 : item 생성
@@ -93,7 +93,7 @@ document.addEventListener("DOMContentLoaded", function () {
   */
   insert_btn.addEventListener("click", function () {
     /* 1. 버튼 활성화 확인 */
-    if (this.className === "btn off") {
+    if (this.className.indexOf("off") > 0) {
       return;
     }
 
@@ -144,6 +144,16 @@ document.addEventListener("DOMContentLoaded", function () {
   list.addEventListener("click", function (e) {
     /* 1. 클릭한 요소를 e.target, 조상요소를 event_item에 저장 */
     var click_item = e.target,
+      /* parentNode로만 검색하는 것들 전부 수정하기
+      원하는 값을 검색할 수 있는 방법 찾기.
+      for문을 이용해서 원하는 depth 만큼( 변수로 원하는 depth를 지정하는 것도 나쁘진 않을 것 같음.)
+      원하는 요소(클래스명?)인지 반복하면서 확인하는 방법도 나쁘진 않을 것 같음.
+      for{
+        if((target.className = target.parentNode.className) === "찾기를 원하는 요소의 클래스 명"){
+          동작 또는 원하는 요소 반환 후 break로 빠져나오기.
+        }
+      }
+      */
       event_item = click_item.parentNode.parentNode,
       check_item = event_item,
       p_target = click_item.parentNode,
@@ -162,16 +172,16 @@ document.addEventListener("DOMContentLoaded", function () {
     while ((event_item = event_item.previousElementSibling) != null) {
       event_idx++;
     }
-
+    event_item = check_item.className.split(' ');
     /* remove 상태에서 텍스트 클릭시 체크 */
-    if (check_item.className === "item remove") {
+    if (event_item.indexOf("remove") > 0) {
       var remove_item = doc.getElementsByClassName("remove_item"),
         remove_target = remove_item[event_idx];
 
       if (remove_target.checked) {
         /* 체크 해제 */
         remove_target.checked = false;
-        p_target.className = p_target.className.replace("remove_check", "");
+        p_target.className = p_target.className.replace(" remove_check", "");
       } else {
         /* 체크 */
         remove_target.checked = true;
@@ -181,7 +191,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     /* sort 상태에서 텍스트 클릭시 체크 */
-    if (check_item.className === "item sort") {
+    if (event_item.indexOf("sort") > 0) {
       var sort_item = doc.getElementsByClassName("sort_item");
 
       for (var i = 0; i < text_box.length; i++) {
@@ -195,43 +205,41 @@ document.addEventListener("DOMContentLoaded", function () {
     /* 4. 텍스트 클릭 토글 */
     if (p_target.className === "text_box on") {
       toggle_text(p_target, event_idx, "off");
-      return
+      return;
     }
     if (p_target.className === "text_box off") {
       toggle_text(p_target, event_idx, "on");
-      return
+      return;
     }
+
 
     /* 5. 버튼 클릭시 동작 */
     switch (click_item.className) {
       case "delete_item":
         list_value.splice((event_idx), 1);
+        changed_value = list_value.join(";");
+        localStorage.setItem("todo_list", changed_value);
+
+        init_page();
         break;
 
       case "icon_box":
-        icon_flag = true;
-        toggle_icon();
-        return;
+        toggle_icon("on");
+        break;
 
       case "up_item":
         move_list(event_idx, event_idx - 1);
-        return;
+        break;
 
       case "down_item":
         move_list(event_idx, event_idx + 1);
-        return;
+        break;
 
       case "check_item":
-        icon_flag = false;
-        toggle_icon();
+        toggle_icon("off");
         break;
     }
 
-    /* 6. localStorage 변경 */
-    changed_value = list_value.join(";");
-    localStorage.setItem("todo_list", changed_value);
-
-    init_page();
   });
 
   /* 삭제버튼 동작
@@ -243,7 +251,7 @@ document.addEventListener("DOMContentLoaded", function () {
   remove_btn.addEventListener("click", function () {
     /* 1. 버튼 활성화 확인, 삭제할 item이 있는지 확인
     - item이 1개일 경우 해당 아이템을 삭제 후 리스트 생성 */
-    if (this.className === "btn off") {
+    if (this.className.indexOf("off") > 0) {
       return;
     }
     if (item.length < 2) {
@@ -253,35 +261,29 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     /* 2. 변수 선언 */
-    var remove_item = list.getElementsByClassName("remove_item"),
-      remove_array = [];
+    var remove_item = list.getElementsByClassName("remove_item");
 
-    icon_flag = false;
+    toggle_icon("off");
     insert_btn.className = "btn off";
     sort_btn.className = "btn off";
 
     /* 삭제모드로 변경, 삭제할 아이템이 있는지 체크 */
-    for (var i = 0; i < item.length; i++) {
+    console.log("삭제버튼 동작.");
+    console.log(item.length);
+
+    for (var i = item.length - 1; i > -1; i--) {
+      console.log("for문 동작.");
       item[i].className = "item remove";
       if (remove_item[i].checked) {
-        remove_array.push(i);
+        list_value.splice([i], 1);
+        console.log("삭제할 요소가 있었음.");
       }
-    }
-
-    /* 삭제한 아이템이 있을 때 */
-    if (remove_array.length > 0) {
-      for (var i = remove_array.length - 1; i > -1; i--) {
-        list_value.splice((remove_array[i]), 1);
-      }
-      changed_value = list_value.join(";");
-      localStorage.setItem("todo_list", changed_value);
-
-      init_page();
-      return;
     }
 
     /* 두 번째 클릭시 초기화 */
     if (btn_flag) {
+      changed_value = list_value.join(";");
+      localStorage.setItem("todo_list", changed_value);
       init_page();
       return;
     }
@@ -295,7 +297,7 @@ document.addEventListener("DOMContentLoaded", function () {
   */
   sort_btn.addEventListener("click", function () {
     /* 버튼 활성화 확인 */
-    if (this.className === "btn off") {
+    if (this.className.indexOf("off") > 0) {
       return;
     }
     /* 버튼이 2개 이상일 때 동작 */
@@ -307,7 +309,7 @@ document.addEventListener("DOMContentLoaded", function () {
     insert_btn.className = "btn off";
     remove_btn.className = "btn off";
     sort_area.className = "sort_area on";
-    icon_flag = false;
+    toggle_icon("off");
 
     /* item에 sort 클래스 추가, 체크한 아이템의 배열 생성 */
     for (var i = 0; i < item.length; i++) {
@@ -418,15 +420,9 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   /* 아이콘 상자 토글 */
-  function toggle_icon() {
-    if (icon_flag) {
-      for (var i = 0; i < icon_box.length; i++) {
-        icon_box[i].className = "icon_box on";
-      }
-    } else {
-      for (var i = 0; i < icon_box.length; i++) {
-        icon_box[i].className = "icon_box";
-      }
+  function toggle_icon(toggle) {
+    for (var i = 0; i < icon_box.length; i++) {
+      icon_box[i].className = "icon_box " + toggle;
     }
   }
 
@@ -439,7 +435,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var target_item = list_value[target].split(/[\|]/g);
 
     /* 2. text_box 상태 변경, 로컬스토리지 저장값 변경 */
-    icon_flag = false;
+    toggle_icon("off");
     p_target.className = "text_box " + toggle;
 
     target_item[2] = toggle;

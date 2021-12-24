@@ -155,8 +155,10 @@ body {
       display: block;
       visibility: hidden;
     }
+
     &:hover {
       background-color: #5a3232;
+
       .delete_item {
         visibility: visible;
       }
@@ -215,9 +217,9 @@ body {
   }
 
   h4 {
-    max-height: 2rem;
     padding: 10px 0 5px;
     overflow: hidden;
+    white-space: nowrap;
     text-overflow: ellipsis;
   }
 
