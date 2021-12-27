@@ -5,22 +5,19 @@ document.addEventListener("DOMContentLoaded", function () {
   $list_value = todo_list를 배열로 변환한 결과
   */
   var doc = document,
-    todo_text = doc.getElementById("todo_text"),
-    insert_btn = doc.getElementById("insert_btn"),
-    remove_btn = doc.getElementById("remove_btn"),
-    sort_btn = doc.getElementById("sort_btn"),
-    sort_btn_on = doc.getElementById("sort_btn_on"),
-    sort_area = (doc.getElementsByClassName("sort_area"))[0],
-    sort_num = doc.getElementById("sort_num"),
+    todo_wrap = doc.getElementById("todo_wrap"),
     list = doc.getElementById("list"),
     item = list.children,
     text_box = list.getElementsByClassName("text_box"),
     icon_box = list.getElementsByClassName("icon_box"),
+    /* todo_list와 list_value도 합치기
+    $todo_list에 값이 있는지 확인하지 말고, list_value에 값이 있는지 확인 후 진행하기.
+    */
     todo_list,
     list_value,
-    changed_value = "",
-    btn_flag = false,
-    sort_flag = false;
+    btn_array = [true, false, false],
+    btn_flag,
+    changed_value = "";
 
   init_page();
 
@@ -32,34 +29,26 @@ document.addEventListener("DOMContentLoaded", function () {
   # 동작 : 아이템의 수에 변화가 생기면 
   1. X버튼을 클릭했을 때
   2. 추가버튼을 클릭했을 때
-  3. 삭제버튼을 클릭했을 때 삭제할 아이템이 있는 경우
+  3. 삭제버튼을 클릭했을 때 삭제한 아이템이 있는 경우
   */
   function init_page() {
     /* 변수 선언 */
     var init_text = "",
       item_value;
 
-    /* 1. 버튼의 상태 초기화 */
-    insert_btn.className = "btn";
-    remove_btn.className = "btn";
-    sort_btn.className = "btn off";
-    todo_text.focus();
-    btn_flag = false;
-
-    /* 2. todo_list에서 값 가져오기 */
+    /* todo_list에서 값 가져오기 */
     todo_list = localStorage.getItem('todo_list');
 
-    /* 3. todo_list에 값이 있을 경우 배열로 분리
+    /* todo_list에 값이 있을 경우 배열로 분리
           없을경우 #list 초기화 후 함수 종료 */
     if (todo_list) {
       list_value = todo_list.split(/[\;]/g);
     } else {
-      remove_btn.className = "btn off";
       list.innerHTML = "";
       return;
     }
 
-    /* 4. 반복문을 이용해 총 량/ 속성의 수 만큼 추가 */
+    /* 반복문을 이용해 총 량/ 속성의 수 만큼 추가 */
     for (var i = 0; i < list_value.length; i++) {
       /* time|text(input)|flag가 한 개의 값 */
       item_value = list_value[i].split(/[\|]/g);
@@ -69,77 +58,232 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     list.innerHTML = init_text;
 
-    /* 6. 정렬버튼이 활성화 되어있었다면 정렬버튼 활성화 */
-    if (sort_flag) {
-      btn_flag = true;
-      insert_btn.className = "btn off";
-      remove_btn.className = "btn off";
-      sort_area.className = "sort_area on";
-      sort_num.focus();
-      for (var i = 0; i < item.length; i++) {
-        item[i].className = "item sort";
+    /* item이 2개 이상일 때 정렬버튼 활성화 */
+    if (item.length > 1) {
+      btn_array = [true, true, true];
+    }
+    set_btn(btn_array);
+  };
+
+  /* 버튼 클릭 종합. */
+  todo_wrap.addEventListener("click", function (e) {
+    var click_btn = e.target,
+      sort_area = (doc.getElementsByClassName("sort_area"))[0],
+      sort_num = doc.getElementById("sort_num");
+
+    console.log("####");
+    console.log("click_btn");
+    console.log(click_btn.id);
+
+    /*
+    # 역할 : item 생성
+    # 동작 : 추가버튼을 클릭했을 때
+    */
+    if (click_btn.id === "insert_btn") {
+      console.log("추가버튼 클릭");
+      if (click_btn.className.indexOf("off") > 0) {
+        console.log("버튼 비활성화");
+        return;
       }
+
+      /* 2. 변수 선언
+      test_text: 입력한 값이 없거나, 공백일 경우 체크 */
+      var text_value = (doc.getElementById("todo_text")).value,
+        test_text = text_value.replace(/ /g, ""),
+        now_time = new Date(),
+        reg = /[\/;|`\\]/gi,
+        save_value,
+        total_value,
+        formatted_date = now_time.getFullYear() + "/" + (("0" + (now_time.getMonth() + 1)).slice(-2)) + "/" + now_time.getDate() + " " + (("0" + now_time.getHours()).slice(-2)) + ":" + (("0" + now_time.getMinutes()).slice(-2)) + ":" + (("0" + now_time.getSeconds()).slice(-2));
+
+      /* 3. input 창 내부에 값이 정상적으로 들어있는지 확인
+      - 값이 없으면 경고 */
+      if (test_text.length === 0) {
+        // window.alert("값을 입력해주세요.");
+        /*
+        todo console.log("아래의 테스트용 값 지우기") */
+        text_value = (("0" + now_time.getSeconds()).slice(-2)) + ":" + (("00" + now_time.getMilliseconds()).slice(-3));
+        // return;
+      }
+
+      /* 4. 가져온 값에서 특수문자 제거 */
+      if (reg.test(text_value)) {
+        text_value = text_value.replace(reg, "");
+      }
+
+      /* 5. localStorage에 저장할 값의 형태로 생성 */
+      save_value = formatted_date + "|" + text_value + "|" + "on";
+
+      /* 6. 기존의 값이 있는지 확인 후 통합 */
+      todo_list = localStorage.getItem("todo_list");
+      if (todo_list) {
+        total_value = save_value + ";" + todo_list;
+      } else {
+        total_value = save_value;
+      }
+
+      /* 7. 전체 리스트의 값을 localStorage에 저장 */
+      localStorage.setItem("todo_list", total_value);
+      init_page();
+      return;
     }
 
-    /* 7. item이 2개 이상일 때 정렬버튼 활성화 */
-    if (item.length > 1) {
-      sort_btn.className = "btn";
+    /*
+    # 역할 : 
+    1. 삭제버튼 1번째 클릭시 체크박스 표시 출력
+    2. 삭제버튼 2번째 클릭시 선택한 item 삭제, 초기화
+    # 동작 : 삭제버튼을 클릭했을 때
+    */
+    if (click_btn.id === "remove_btn") {
+      console.log("삭제버튼 클릭");
+      /* 1. 버튼 활성화 확인, 삭제할 item이 있는지 확인
+    - item이 1개일 경우 해당 아이템을 삭제 후 리스트 생성 */
+      if (click_btn.className.indexOf("off") > 0) {
+        console.log("버튼 비활성화");
+        return;
+      }
+      if (item.length < 2) {
+        console.log("바로 아이템 삭제 후 종료");
+        localStorage.clear("todo_list");
+        init_page();
+        return;
+      }
+
+      /* 2. 변수 선언 */
+      var remove_item = list.getElementsByClassName("remove_item");
+
+      toggle_icon("off");
+      console.log("버튼 상태변경");
+      btn_array = [false, true, false];
+      set_btn(btn_array);
+      /* 삭제모드로 변경, 삭제할 아이템이 있는지 체크 */
+      list.className = "remove";
+
+      for (var i = item.length - 1; i > -1; i--) {
+        if (remove_item[i].checked) {
+          list_value.splice([i], 1);
+          console.log("삭제할 요소가 있음.");
+        }
+      }
+
+      /* 두 번째 클릭시 */
+      if (btn_flag) {
+        console.log("두 번째 클릭");
+        btn_flag = false;
+        btn_array = [true, true, true];
+        list.className = "";
+        changed_value = list_value.join(";");
+        localStorage.setItem("todo_list", changed_value);
+        init_page();
+        return;
+      }
+      /* 첫 번째 클릭시 flag 변경 */
+      console.log("첫 번째 클릭");
+      btn_flag = true;
+      return;
     }
-  };
+
+    /*
+    # 역할 : sort_area on/off
+    # 동작 : 정렬버튼 클릭
+    */
+    if (click_btn.id === "sort_btn") {
+      console.log("정렬버튼 클릭");
+      /* 버튼 활성화 확인 */
+      if (click_btn.className.indexOf("off") > 0) {
+        console.log("정렬버튼 비활성화");
+        return;
+      }
+      /* 버튼이 2개 이상일 때 동작 */
+      // if (item.length < 2) {
+      //   console.log("버튼이 2개 미만");
+      //   return;
+      // }
+
+      /* 버튼 비활성화, sort_area에 on 클래스 추가 */
+      btn_array = [false, false, true];
+
+      sort_area.className = "sort_area on";
+      toggle_icon("off");
+
+      /* item에 sort 클래스 추가, 체크한 아이템의 배열 생성 */
+      list.className = "sort";
+
+      /* 두 번째 클릭시 초기화 */
+      if (btn_flag) {
+        console.log("두 번째 클릭");
+        btn_array = [true, true, true];
+
+        sort_area.className = "sort_area";
+        list.className = "";
+        for (var i = 0; i < item.length; i++) {
+          text_box[i].className = text_box[i].className.replace(" sort_check", "");
+        }
+        btn_flag = false;
+        set_btn(btn_array);
+        return;
+      }
+
+      /* 첫 번째 클릭시 flag 변경 */
+      console.log("첫 번째 클릭");
+      btn_flag = true;
+      set_btn(btn_array);
+      return;
+    }
+
+    /*
+    # 역할 : 선택한 아이템 위치 변경
+    # 동작 : 정렬_on 버튼 클릭 시
+    */
+    if (click_btn.id === "sort_btn_on") {
+      var sort_item = doc.getElementsByName("sort"),
+        checked_item,
+        sort_value = sort_num.value;
+
+      /* sort_item이 체크가 되어있는지 확인 */
+      for (var i = 0; i < item.length; i++) {
+        if (sort_item[i].checked) {
+          checked_item = i;
+        }
+      }
+
+      /* 체크유무 확인 */
+      if (isNaN(checked_item)) {
+        alert("리스트를 체크해주세요");
+        return;
+      }
+
+      /* 입력받은 값이 양수인지 확인 */
+      if (sort_value < 1) {
+        alert("양수를 입력해주세요.");
+        return;
+      }
+
+      /* 입력받은 숫자가 리스트의 전체 개수보다 작은지 확인 */
+      if (sort_value > item.length) {
+        alert("리스트 전체 수보다 작은 숫자를 입력해주세요.");
+        return;
+      }
+      sort_value--;
+
+      /* 아이템 이동 */
+      move_list(checked_item, sort_value);
+      return;
+    }
+  });
 
   /*
   # 역할 : item 생성
   # 동작 : 추가버튼을 클릭했을 때
   */
-  insert_btn.addEventListener("click", function () {
-    /* 1. 버튼 활성화 확인 */
-    if (this.className.indexOf("off") > 0) {
-      return;
-    }
-
-    /* 2. 변수 선언
-    test_text: 입력한 값이 없거나, 공백일 경우 체크 */
-    var text_value = todo_text.value,
-      test_text = text_value.replace(/ /g, ""),
-      now_time = new Date(),
-      reg = /[\/;|`\\]/gi,
-      save_value,
-      formatted_date = now_time.getFullYear() + "/" + (("0" + (now_time.getMonth() + 1)).slice(-2)) + "/" + now_time.getDate() + " " + (("0" + now_time.getHours()).slice(-2)) + ":" + (("0" + now_time.getMinutes()).slice(-2)) + ":" + (("0" + now_time.getSeconds()).slice(-2));
-
-    /* 3. input 창 내부에 값이 정상적으로 들어있는지 확인
-    - 값이 없으면 경고 */
-    if (test_text.length === 0) {
-      // window.alert("값을 입력해주세요.");
-      /*
-      todo console.log("아래의 테스트용 값 지우기") */
-      text_value = (("0" + now_time.getSeconds()).slice(-2)) + ":" + (("00" + now_time.getMilliseconds()).slice(-3));
-      // return;
-    }
-
-    /* 4. 가져온 값에서 특수문자 제거 */
-    if (reg.test(text_value)) {
-      text_value = text_value.replace(reg, "");
-    }
-
-    /* 5. localStorage에 저장할 값의 형태로 생성 */
-    save_value = formatted_date + "|" + text_value + "|" + "on";
-
-    /* 6. 기존의 값이 있는지 확인 후 통합 */
-    todo_list = localStorage.getItem("todo_list");
-    if (todo_list) {
-      var total_value = save_value + ";" + todo_list;
-    } else {
-      var total_value = save_value;
-    }
-
-    /* 7. 전체 리스트의 값을 localStorage에 저장 */
-    localStorage.setItem("todo_list", total_value);
-    init_page();
-  });
+  // insert_btn.addEventListener("click", function () {
+  // });
 
   /*
   # 역할 : 이벤트 발생시 로컬스토리지 수정 후 init_page 호출
   # 동작 : #list에 클릭이벤트가 발생했을 때 동작
+
+  todo 잠시 보류.
   */
   list.addEventListener("click", function (e) {
     /* 1. 클릭한 요소를 e.target, 조상요소를 event_item에 저장 */
@@ -154,19 +298,35 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       }
       */
-      event_item = click_item.parentNode.parentNode,
-      check_item = event_item,
-      p_target = click_item.parentNode,
+      
+      event_item,   // item 클래스가 들어있는 요소
+      // check_item = event_item,
+      p_target,
       event_idx = 0;
+
+
+    // event_item = event_item.parentNode;
+    console.log("event_item");
+    // console.log(event_item.className.indexOf("item"));
+    console.log("p_target");
+    // console.log(p_target.className.indexOf("text_box"));
+
 
     /* 클릭한 요소가 item일 경우 */
     if (click_item === list) {
       return;
     }
 
-    if (p_target === list) {
-      return;
+    /* 클릭한게 아이템일 때 */
+    if (click_item.className.indexOf("item") === 0) {
+      event_item = click_item;
     }
+    if (click_item.parentNode.className.indexOf("item") === 0) {
+      event_item = click_item.parentNode;
+      p_target = click_item;
+    }
+
+    /* 클릭한게 텍스트박스일 때? */
 
     /* 3. 클릭한 요소의 인덱스 찾기 */
     while ((event_item = event_item.previousElementSibling) != null) {
@@ -242,137 +402,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   });
 
-  /* 삭제버튼 동작
-  # 역할 : 
-  1. 삭제버튼 1번째 클릭시 체크박스 표시 출력
-  2. 삭제버튼 2번째 클릭시 선택한 item 삭제, 초기화
-  # 동작 : 삭제버튼을 클릭했을 때
-  */
-  remove_btn.addEventListener("click", function () {
-    /* 1. 버튼 활성화 확인, 삭제할 item이 있는지 확인
-    - item이 1개일 경우 해당 아이템을 삭제 후 리스트 생성 */
-    if (this.className.indexOf("off") > 0) {
-      return;
-    }
-    if (item.length < 2) {
-      localStorage.clear("todo_list");
-      init_page();
-      return;
-    }
-
-    /* 2. 변수 선언 */
-    var remove_item = list.getElementsByClassName("remove_item");
-
-    toggle_icon("off");
-    insert_btn.className = "btn off";
-    sort_btn.className = "btn off";
-
-    /* 삭제모드로 변경, 삭제할 아이템이 있는지 체크 */
-    console.log("삭제버튼 동작.");
-    console.log(item.length);
-
-    for (var i = item.length - 1; i > -1; i--) {
-      console.log("for문 동작.");
-      item[i].className = "item remove";
-      if (remove_item[i].checked) {
-        list_value.splice([i], 1);
-        console.log("삭제할 요소가 있었음.");
-      }
-    }
-
-    /* 두 번째 클릭시 초기화 */
-    if (btn_flag) {
-      changed_value = list_value.join(";");
-      localStorage.setItem("todo_list", changed_value);
-      init_page();
-      return;
-    }
-    /* 첫 번째 클릭시 flag 변경 */
-    btn_flag = true;
-  });
-
-  /*
-  # 역할 : sort_area on/off
-  # 동작 : 정렬버튼 클릭
-  */
-  sort_btn.addEventListener("click", function () {
-    /* 버튼 활성화 확인 */
-    if (this.className.indexOf("off") > 0) {
-      return;
-    }
-    /* 버튼이 2개 이상일 때 동작 */
-    if (item.length < 2) {
-      return;
-    }
-
-    /* 버튼 비활성화, sort_area에 on 클래스 추가 */
-    insert_btn.className = "btn off";
-    remove_btn.className = "btn off";
-    sort_area.className = "sort_area on";
-    toggle_icon("off");
-
-    /* item에 sort 클래스 추가, 체크한 아이템의 배열 생성 */
-    for (var i = 0; i < item.length; i++) {
-      item[i].className = "item sort";
-    }
-
-    /* 두 번째 클릭시 초기화 */
-    if (btn_flag) {
-      insert_btn.className = "btn";
-      remove_btn.className = "btn";
-      sort_area.className = "sort_area";
-      for (var i = 0; i < item.length; i++) {
-        item[i].className = "item normal";
-        text_box[i].className = text_box[i].className.replace("sort_check", "");
-      }
-      btn_flag = false;
-      sort_flag = false;
-      return;
-    }
-
-    /* 첫 번째 클릭시 flag 변경 */
-    btn_flag = true;
-  });
-
-  /*
-  # 역할 : 선택한 아이템 위치 변경
-  # 동작 : 정렬_on 버튼 클릭 시
-  */
-  sort_btn_on.addEventListener("click", function () {
-    var sort_item = doc.getElementsByName("sort"),
-      checked_item,
-      sort_value = sort_num.value;
-
-    /* sort_item이 체크가 되어있는지 확인 */
-    for (var i = 0; i < item.length; i++) {
-      if (sort_item[i].checked) {
-        checked_item = i;
-      }
-    }
-
-    /* 체크유무 확인 */
-    if (isNaN(checked_item)) {
-      alert("리스트를 체크해주세요");
-      return;
-    }
-
-    /* 입력받은 값이 양수인지 확인 */
-    if (sort_value < 1) {
-      alert("양수를 입력해주세요.");
-      return;
-    }
-
-    /* 입력받은 숫자가 리스트의 전체 개수보다 작은지 확인 */
-    if (sort_value > item.length) {
-      alert("리스트 전체 수보다 작은 숫자를 입력해주세요.");
-      return;
-    }
-    sort_value--;
-
-    /* 아이템 이동 */
-    move_list(checked_item, sort_value);
-  });
-
   /* 
   # 역할 : Todo-List 아이템의 구조 생성
   # 동작 :
@@ -445,5 +474,16 @@ document.addEventListener("DOMContentLoaded", function () {
     changed_value = list_value.join(";");
     localStorage.setItem("todo_list", changed_value);
 
+  }
+
+  function set_btn(array) {
+    var todo_btn = todo_wrap.getElementsByClassName("btn");  
+    for(var i = 0; i < array.length; i++) {
+      if (array[i]) {
+        todo_btn[i].className = "btn on";
+      } else {
+        todo_btn[i].className = "btn off";
+      }
+    }
   }
 });
