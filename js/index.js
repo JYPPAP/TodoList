@@ -8,16 +8,16 @@ document.addEventListener("DOMContentLoaded", function () {
     todo_wrap = doc.getElementById("todo_wrap"),
     list = doc.getElementById("list"),
     item = list.children,
+    item_length = item.length,
     text_box = list.getElementsByClassName("text_box"),
     icon_box = list.getElementsByClassName("icon_box"),
     /* todo_list와 list_value도 합치기
     $todo_list에 값이 있는지 확인하지 말고, list_value에 값이 있는지 확인 후 진행하기.
     */
-    todo_list,
     list_value,
+    changed_value = "",
     btn_array = [true, false, false],
-    btn_flag,
-    changed_value = "";
+    btn_flag;
 
   init_page();
 
@@ -34,7 +34,8 @@ document.addEventListener("DOMContentLoaded", function () {
   function init_page() {
     /* 변수 선언 */
     var init_text = "",
-      item_value;
+      item_value,
+      todo_list;
 
     /* todo_list에서 값 가져오기 */
     todo_list = localStorage.getItem('todo_list');
@@ -42,8 +43,11 @@ document.addEventListener("DOMContentLoaded", function () {
     /* todo_list에 값이 있을 경우 배열로 분리
           없을경우 #list 초기화 후 함수 종료 */
     if (todo_list) {
+      btn_array[1] = true;
       list_value = todo_list.split(/[\;]/g);
     } else {
+      btn_array = [true, false, false];
+      set_btn(btn_array);
       list.innerHTML = "";
       return;
     }
@@ -59,9 +63,12 @@ document.addEventListener("DOMContentLoaded", function () {
     list.innerHTML = init_text;
 
     /* item이 2개 이상일 때 정렬버튼 활성화 */
-    if (item.length > 1) {
-      btn_array = [true, true, true];
+    if (item_length > 1) {
+      btn_array[2] = true;
+    } else {
+      btn_array[2] = false;
     }
+    console.log(btn_array);
     set_btn(btn_array);
   };
 
@@ -94,6 +101,7 @@ document.addEventListener("DOMContentLoaded", function () {
         reg = /[\/;|`\\]/gi,
         save_value,
         total_value,
+        todo_list,
         formatted_date = now_time.getFullYear() + "/" + (("0" + (now_time.getMonth() + 1)).slice(-2)) + "/" + now_time.getDate() + " " + (("0" + now_time.getHours()).slice(-2)) + ":" + (("0" + now_time.getMinutes()).slice(-2)) + ":" + (("0" + now_time.getSeconds()).slice(-2));
 
       /* 3. input 창 내부에 값이 정상적으로 들어있는지 확인
@@ -194,11 +202,6 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("정렬버튼 비활성화");
         return;
       }
-      /* 버튼이 2개 이상일 때 동작 */
-      // if (item.length < 2) {
-      //   console.log("버튼이 2개 미만");
-      //   return;
-      // }
 
       /* 버튼 비활성화, sort_area에 on 클래스 추가 */
       btn_array = [false, false, true];
@@ -272,69 +275,44 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  /*
-  # 역할 : item 생성
-  # 동작 : 추가버튼을 클릭했을 때
-  */
-  // insert_btn.addEventListener("click", function () {
-  // });
 
-  /*
-  # 역할 : 이벤트 발생시 로컬스토리지 수정 후 init_page 호출
-  # 동작 : #list에 클릭이벤트가 발생했을 때 동작
-
-  todo 잠시 보류.
-  */
   list.addEventListener("click", function (e) {
     /* 1. 클릭한 요소를 e.target, 조상요소를 event_item에 저장 */
     var click_item = e.target,
-      /* parentNode로만 검색하는 것들 전부 수정하기
-      원하는 값을 검색할 수 있는 방법 찾기.
-      for문을 이용해서 원하는 depth 만큼( 변수로 원하는 depth를 지정하는 것도 나쁘진 않을 것 같음.)
-      원하는 요소(클래스명?)인지 반복하면서 확인하는 방법도 나쁘진 않을 것 같음.
-      for{
-        if((target.className = target.parentNode.className) === "찾기를 원하는 요소의 클래스 명"){
-          동작 또는 원하는 요소 반환 후 break로 빠져나오기.
-        }
-      }
-      */
-      
-      event_item,   // item 클래스가 들어있는 요소
-      // check_item = event_item,
-      p_target,
+      event_item = click_item,
+      check_item,
+      p_target = click_item.parentNode,
       event_idx = 0;
-
-
-    // event_item = event_item.parentNode;
-    console.log("event_item");
-    // console.log(event_item.className.indexOf("item"));
-    console.log("p_target");
-    // console.log(p_target.className.indexOf("text_box"));
-
-
+    
     /* 클릭한 요소가 item일 경우 */
     if (click_item === list) {
       return;
     }
 
-    /* 클릭한게 아이템일 때 */
-    if (click_item.className.indexOf("item") === 0) {
-      event_item = click_item;
+    for (var i = 0; i < 4; i++) {
+      event_item = event_item.parentNode;
+      if (event_item.className.indexOf("item") > -1) {
+        check_item = event_item;
+        break;
+      }
+      if(i === 4) {
+        return;
+      }
     }
-    if (click_item.parentNode.className.indexOf("item") === 0) {
-      event_item = click_item.parentNode;
-      p_target = click_item;
-    }
-
-    /* 클릭한게 텍스트박스일 때? */
 
     /* 3. 클릭한 요소의 인덱스 찾기 */
     while ((event_item = event_item.previousElementSibling) != null) {
       event_idx++;
     }
+    console.log("click_item");
+    console.log(click_item);
+    console.log("event_idx");
+    console.log(event_idx);
+    console.log("check_item");
+    console.log(check_item);
     event_item = check_item.className.split(' ');
     /* remove 상태에서 텍스트 클릭시 체크 */
-    if (event_item.indexOf("remove") > 0) {
+    if (list.className === "remove") {
       var remove_item = doc.getElementsByClassName("remove_item"),
         remove_target = remove_item[event_idx];
 
@@ -351,10 +329,10 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     /* sort 상태에서 텍스트 클릭시 체크 */
-    if (event_item.indexOf("sort") > 0) {
+    if (list.className === "sort") {
       var sort_item = doc.getElementsByClassName("sort_item");
 
-      for (var i = 0; i < text_box.length; i++) {
+      for (var i = 0; i < item.length; i++) {
         text_box[i].className = text_box[i].className.replace("sort_check", "");
       }
       sort_item[event_idx].checked = true;
@@ -402,6 +380,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   });
 
+
   /* 
   # 역할 : Todo-List 아이템의 구조 생성
   # 동작 :
@@ -410,17 +389,23 @@ document.addEventListener("DOMContentLoaded", function () {
   */
   function set_list(text, time, flag) {
     /* 1. 아이템의 구조 (input에 입력한 텍스트, 현재 시간, 텍스트의 line-through 유무(on/off) )를 가져와 아이템의 프레임에 입력 */
-    var total_item = "",
-      set_flag,
-      set_text,
-      set_time;
+    var total_item = "";
 
-    total_item = '<div class="btn_box"><button class="delete_item">❌</button><input type="checkbox" class="remove_item"><input type="radio" name="sort" class="sort_item"></div>';
-    set_flag = '<div class="text_box ' + flag + '">'
-    set_text = '<h4 class="input_text">' + text + '</h4>';
-    set_time = '<p>' + time + '</p>';
-    total_item += set_flag + set_text + set_time + '</div>';
-    total_item += '<div class="icon_box"><button class="up_item">🔺</button><button class="down_item">🔻</button><button class="check_item">✅</button></div>';
+    total_item = ''
+    +'<div class="btn_box">'
+      +'<button class="delete_item">❌</button>'
+      +'<input type="checkbox" class="remove_item">'
+      +'<input type="radio" name="sort" class="sort_item">'
+    +'</div>'
+    +'<div class="text_box ' + flag + '">'
+      +'<h4 class="input_text">' + text + '</h4>'
+      +'<p>' + time + '</p>'
+    +'</div>'
+    +'<div class="icon_box">'
+      +'<button class="up_item">🔺</button>'
+      +'<button class="down_item">🔻</button>'
+      +'<button class="check_item">✅</button>'
+    +'</div>';
 
     /* 입력한 결과를 반환 */
     return total_item;
@@ -450,7 +435,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   /* 아이콘 상자 토글 */
   function toggle_icon(toggle) {
-    for (var i = 0; i < icon_box.length; i++) {
+    for (var i = 0; i < item.length; i++) {
       icon_box[i].className = "icon_box " + toggle;
     }
   }
