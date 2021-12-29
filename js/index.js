@@ -8,12 +8,9 @@ document.addEventListener("DOMContentLoaded", function () {
     todo_wrap = doc.getElementById("todo_wrap"),
     list = doc.getElementById("list"),
     item = list.children,
-    item_length = item.length,
+    item_length,
     text_box = list.getElementsByClassName("text_box"),
     icon_box = list.getElementsByClassName("icon_box"),
-    /* todo_list와 list_value도 합치기
-    $todo_list에 값이 있는지 확인하지 말고, list_value에 값이 있는지 확인 후 진행하기.
-    */
     list_value,
     changed_value = "",
     btn_array = [true, false, false],
@@ -61,7 +58,7 @@ document.addEventListener("DOMContentLoaded", function () {
       init_text += '</li>';
     }
     list.innerHTML = init_text;
-
+    item_length = item.length;
     /* item이 2개 이상일 때 정렬버튼 활성화 */
     if (item_length > 1) {
       btn_array[2] = true;
@@ -150,7 +147,7 @@ document.addEventListener("DOMContentLoaded", function () {
         console.log("버튼 비활성화");
         return;
       }
-      if (item.length < 2) {
+      if (item_length < 2) {
         console.log("바로 아이템 삭제 후 종료");
         localStorage.clear("todo_list");
         init_page();
@@ -167,7 +164,7 @@ document.addEventListener("DOMContentLoaded", function () {
       /* 삭제모드로 변경, 삭제할 아이템이 있는지 체크 */
       list.className = "remove";
 
-      for (var i = item.length - 1; i > -1; i--) {
+      for (var i = item_length - 1; i > -1; i--) {
         if (remove_item[i].checked) {
           list_value.splice([i], 1);
           console.log("삭제할 요소가 있음.");
@@ -219,7 +216,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         sort_area.className = "sort_area";
         list.className = "";
-        for (var i = 0; i < item.length; i++) {
+        for (var i = 0; i < item_length; i++) {
           text_box[i].className = text_box[i].className.replace(" sort_check", "");
         }
         btn_flag = false;
@@ -244,7 +241,7 @@ document.addEventListener("DOMContentLoaded", function () {
         sort_value = sort_num.value;
 
       /* sort_item이 체크가 되어있는지 확인 */
-      for (var i = 0; i < item.length; i++) {
+      for (var i = 0; i < item_length; i++) {
         if (sort_item[i].checked) {
           checked_item = i;
         }
@@ -263,7 +260,7 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       /* 입력받은 숫자가 리스트의 전체 개수보다 작은지 확인 */
-      if (sort_value > item.length) {
+      if (sort_value > item_length) {
         alert("리스트 전체 수보다 작은 숫자를 입력해주세요.");
         return;
       }
@@ -332,7 +329,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (list.className === "sort") {
       var sort_item = doc.getElementsByClassName("sort_item");
 
-      for (var i = 0; i < item.length; i++) {
+      for (var i = 0; i < item_length; i++) {
         text_box[i].className = text_box[i].className.replace("sort_check", "");
       }
       sort_item[event_idx].checked = true;
@@ -435,7 +432,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   /* 아이콘 상자 토글 */
   function toggle_icon(toggle) {
-    for (var i = 0; i < item.length; i++) {
+    for (var i = 0; i < item_length; i++) {
       icon_box[i].className = "icon_box " + toggle;
     }
   }
